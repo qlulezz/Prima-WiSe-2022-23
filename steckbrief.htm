@@ -1,25 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-	<meta charset="utf-8" />
-	<title>Steckbrief</title>
-	<style>
-		body {
-			font-family: arial;
-			font-size: small;
-			background: #eee
-		}
-	</style>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steckbrief</title>
 </head>
 
 <body>
-	<a href="https://github.com/qlulezz/Prima-WiSe-2022-23" target="_blank" rel="noopener noreferrer">
-		Prima GitHub Repo
-	</a>
-	<a href="https://qlulezz.github.io/Prima-WiSe-2022-23/Mario/index.html" target="_blank" rel="noopener noreferrer">
-		Projekt Mario
-	</a>
+    <div class="container">
+        <a href="https://github.com/qlulezz/Prima-WiSe-2022-23" target="_blank" rel="noopener noreferrer"
+            class="gradient-text">
+            GitHub Repository
+        </a>
+        <a href="https://qlulezz.github.io/Prima-WiSe-2022-23/Mario/index.html" target="_blank"
+            rel="noopener noreferrer" class="gradient-text">
+            Projekt Minecraft Mario
+        </a>
+    </div>
+
+    <style>
+        body {
+            font-family: arial;
+            background: #eee;
+            font-size: small;
+        }
+
+        .container {
+            display: flex;
+            gap: .25em;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, red, orange, green, blue, indigo, violet, red);
+            background-size: 1000% 200%;
+            animation: rainbow 5s ease-in-out infinite;
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: rgba(0, 0, 0, 0);
+            transition: margin .2s ease-in-out;
+            font-weight: bold;
+        }
+
+        .gradient-text:hover {
+            margin-left: 10px;
+        }
+
+        @keyframes rainbow {
+            0% {
+                background-position: left
+            }
+
+            50% {
+                background-position: right
+            }
+
+            100% {
+                background-position: left
+            }
+        }
+    </style>
 </body>
 
 </html>
