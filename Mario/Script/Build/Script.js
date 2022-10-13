@@ -56,28 +56,22 @@ var Script;
     const framerate = 8;
     let spriteNode;
     async function hndLoad(_event) {
-        let root = new ƒ.Node("root");
         let imgSpriteSheet = new ƒ.TextureImage();
         await imgSpriteSheet.load("./Images/characters.gif");
         let coat = new ƒ.CoatTextured(undefined, imgSpriteSheet);
         let animation = new ƒAid.SpriteSheetAnimation("Walk", coat);
-        animation.generateByGrid(ƒ.Rectangle.GET(297, 1, 16, 32), 3, 16, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(17));
+        animation.generateByGrid(ƒ.Rectangle.GET(297, 1, 16, 32), 3, 48, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(17));
         spriteNode = new ƒAid.NodeSprite("Sprite");
         spriteNode.addComponent(new ƒ.ComponentTransform(new ƒ.Matrix4x4()));
         spriteNode.setAnimation(animation);
         spriteNode.setFrameDirection(1);
-        spriteNode.mtxLocal.translateY(-1);
+        spriteNode.mtxLocal.translateY(-.65);
+        spriteNode.mtxLocal.translateX(-.5);
+        spriteNode.mtxLocal.translateZ(1);
         spriteNode.framerate = framerate;
-        root.addChild(spriteNode);
-        // Replace temp cam and viewport with already initialized scene
-        let cmpCamera = new ƒ.ComponentCamera();
-        cmpCamera.mtxPivot.translateZ(5);
-        cmpCamera.mtxPivot.rotateY(180);
-        const canvas = document.querySelector("canvas");
-        viewport = new ƒ.Viewport();
-        viewport.initialize("Viewport", root, cmpCamera, canvas);
-        viewport.camera.clrBackground = ƒ.Color.CSS("Black");
-        viewport.draw();
+        let graph = viewport.getBranch();
+        let mario = graph.getChildrenByName("Mario")[0];
+        mario.addChild(spriteNode);
         ƒ.Loop.addEventListener("loopFrame" /* ƒ.EVENT.LOOP_FRAME */, update);
         ƒ.Loop.start(ƒ.LOOP_MODE.TIME_GAME, framerate);
     }
