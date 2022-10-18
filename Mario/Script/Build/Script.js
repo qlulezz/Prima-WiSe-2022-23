@@ -40,59 +40,22 @@ var Script;
 (function (Script) {
     var ƒ = FudgeCore;
     var ƒAid = FudgeAid;
-    ƒ.Debug.info("Main Program Template running!");
+    // Initialize Viewport
     let viewport;
     document.addEventListener("interactiveViewportStarted", start);
     function start(_event) {
         viewport = _event.detail;
         hndLoad(_event);
-        // ƒ.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
-    let keyA = false;
-    let keyD = false;
-    window.addEventListener("keydown", onKeyDown, false);
-    window.addEventListener("keyup", onKeyUp, false);
-    function onKeyDown(event) {
-        var keyCode = event.keyCode;
-        switch (keyCode) {
-            case 65: //a
-                keyA = true;
-                break;
-            case 68: //d
-                keyD = true;
-                break;
-        }
-    }
-    function onKeyUp(event) {
-        var keyCode = event.keyCode;
-        switch (keyCode) {
-            case 65: //a
-                keyA = false;
-                break;
-            case 68: //d
-                keyD = false;
-                break;
-        }
-    }
-    let x = .05;
-    function update(_event) {
-        // ƒ.Physics.simulate();  // if physics is included and used
-        viewport.draw();
-        if (keyA == true) {
-            spriteNode.mtxLocal.translateX(-x);
-        }
-        if (keyD == true) {
-            spriteNode.mtxLocal.translateX(x);
-        }
-        ƒ.AudioManager.default.update();
-    }
+    // Load Sprite
     let spriteNode;
+    let animation;
     async function hndLoad(_event) {
         let imgSpriteSheet = new ƒ.TextureImage();
         await imgSpriteSheet.load("./Images/Mario_Walk.png");
         let coat = new ƒ.CoatTextured(undefined, imgSpriteSheet);
-        let animation = new ƒAid.SpriteSheetAnimation("Walk", coat);
-        animation.generateByGrid(ƒ.Rectangle.GET(0, 16, 16, 16), 3, 64, ƒ.ORIGIN2D.BOTTOMLEFT, ƒ.Vector2.X(17));
+        animation = new ƒAid.SpriteSheetAnimation("Walk", coat);
+        animation.generateByGrid(ƒ.Rectangle.GET(0, 16, 16, 16), 3, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(17));
         spriteNode = new ƒAid.NodeSprite("Sprite");
         spriteNode.addComponent(new ƒ.ComponentTransform(new ƒ.Matrix4x4()));
         spriteNode.setAnimation(animation);
@@ -100,12 +63,43 @@ var Script;
         spriteNode.framerate = 8;
         spriteNode.mtxLocal.translateY(-.3);
         spriteNode.mtxLocal.translateX(-1);
-        spriteNode.mtxLocal.translateZ(1.01);
+        spriteNode.mtxLocal.translateZ(1.001);
         let branch = viewport.getBranch();
         let mario = branch.getChildrenByName("Mario")[0];
         mario.addChild(spriteNode);
         ƒ.Loop.addEventListener("loopFrame" /* ƒ.EVENT.LOOP_FRAME */, update);
         ƒ.Loop.start(ƒ.LOOP_MODE.TIME_GAME, 30);
+    }
+    let leftDirection = false;
+    let lastDirection = false;
+    let walkSpeed = 1;
+    function update(_event) {
+        let amount = walkSpeed * ƒ.Loop.timeFrameGame / 1000;
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT])) {
+            spriteNode.mtxLocal.translateX(-amount);
+            leftDirection = true;
+            spriteNode.setFrameDirection(1);
+        }
+        else if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT])) {
+            spriteNode.mtxLocal.translateX(amount);
+            leftDirection = false;
+            spriteNode.setFrameDirection(1);
+        }
+        else {
+            spriteNode.showFrame(0);
+        }
+        if (leftDirection && !lastDirection) {
+            spriteNode.mtxLocal.rotation = ƒ.Vector3.Y(180);
+            lastDirection = true;
+            walkSpeed = -walkSpeed;
+        }
+        else if (!leftDirection && lastDirection) {
+            spriteNode.mtxLocal.rotation = ƒ.Vector3.Y(0);
+            lastDirection = false;
+            walkSpeed = -walkSpeed;
+        }
+        viewport.draw();
+        ƒ.AudioManager.default.update();
     }
 })(Script || (Script = {}));
 //# sourceMappingURL=Script.js.map

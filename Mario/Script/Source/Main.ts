@@ -1,72 +1,26 @@
 namespace Script {
   import ƒ = FudgeCore;
   import ƒAid = FudgeAid;
-  ƒ.Debug.info("Main Program Template running!");
 
+  // Initialize Viewport
   let viewport: ƒ.Viewport;
   document.addEventListener("interactiveViewportStarted", <EventListener>start);
 
   function start(_event: CustomEvent): void {
     viewport = _event.detail;
-
     hndLoad(_event);
-    // ƒ.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
   }
 
-  let keyA = false;
-  let keyD = false;
-
-  window.addEventListener("keydown", onKeyDown, false);
-  window.addEventListener("keyup", onKeyUp, false);
-
-  function onKeyDown(event: KeyboardEvent) {
-    var keyCode = event.keyCode;
-    switch (keyCode) {
-      case 65: //a
-        keyA = true;
-        break;
-      case 68: //d
-        keyD = true;
-        break;
-    }
-  }
-
-  function onKeyUp(event: KeyboardEvent) {
-    var keyCode = event.keyCode;
-
-    switch (keyCode) {
-      case 65: //a
-        keyA = false;
-        break;
-      case 68: //d
-        keyD = false;
-        break;
-    }
-  }
-
-  let x: number = .05;
-  function update(_event: Event): void {
-    // ƒ.Physics.simulate();  // if physics is included and used
-    viewport.draw();
-
-    if (keyA == true) {
-      spriteNode.mtxLocal.translateX(-x);
-    }
-    if (keyD == true) {
-      spriteNode.mtxLocal.translateX(x);
-    }
-    ƒ.AudioManager.default.update();
-  }
-
+  // Load Sprite
   let spriteNode: ƒAid.NodeSprite;
-
+  let animation: ƒAid.SpriteSheetAnimation;
   async function hndLoad(_event: Event): Promise<void> {
     let imgSpriteSheet: ƒ.TextureImage = new ƒ.TextureImage();
     await imgSpriteSheet.load("./Images/Mario_Walk.png");
     let coat: ƒ.CoatTextured = new ƒ.CoatTextured(undefined, imgSpriteSheet);
 
-    let animation: ƒAid.SpriteSheetAnimation = new ƒAid.SpriteSheetAnimation("Walk", coat);
-    animation.generateByGrid(ƒ.Rectangle.GET(0, 16, 16, 16), 3, 64, ƒ.ORIGIN2D.BOTTOMLEFT, ƒ.Vector2.X(17));
+    animation = new ƒAid.SpriteSheetAnimation("Walk", coat);
+    animation.generateByGrid(ƒ.Rectangle.GET(0, 16, 16, 16), 3, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(17));
 
     spriteNode = new ƒAid.NodeSprite("Sprite");
     spriteNode.addComponent(new ƒ.ComponentTransform(new ƒ.Matrix4x4()));
@@ -76,7 +30,7 @@ namespace Script {
 
     spriteNode.mtxLocal.translateY(-.3);
     spriteNode.mtxLocal.translateX(-1);
-    spriteNode.mtxLocal.translateZ(1.01);
+    spriteNode.mtxLocal.translateZ(1.001);
 
     let branch: ƒ.Node = viewport.getBranch();
     let mario: ƒ.Node = branch.getChildrenByName("Mario")[0];
@@ -85,4 +39,40 @@ namespace Script {
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start(ƒ.LOOP_MODE.TIME_GAME, 30);
   }
+
+  let leftDirection = false;
+  let lastDirection = false;
+
+  let walkSpeed: number = 1;
+
+  function update(_event: Event): void {
+
+    let amount = walkSpeed * ƒ.Loop.timeFrameGame / 1000;
+    
+    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT])) {
+      spriteNode.mtxLocal.translateX(-amount);
+      leftDirection = true;
+      spriteNode.setFrameDirection(1);
+    } else if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT])) {
+      spriteNode.mtxLocal.translateX(amount);
+      leftDirection = false;
+      spriteNode.setFrameDirection(1);
+    } else {
+      spriteNode.showFrame(0);
+    }
+
+    if (leftDirection && !lastDirection) {
+      spriteNode.mtxLocal.rotation = ƒ.Vector3.Y(180);
+      lastDirection = true;
+      walkSpeed = -walkSpeed;
+    } else if (!leftDirection && lastDirection) {
+      spriteNode.mtxLocal.rotation = ƒ.Vector3.Y(0);
+      lastDirection = false;
+      walkSpeed = -walkSpeed;
+    }
+
+    viewport.draw();
+    ƒ.AudioManager.default.update();
+  }
+
 }
