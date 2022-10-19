@@ -47,59 +47,115 @@ var Script;
         viewport = _event.detail;
         hndLoad(_event);
     }
+    let walkAnimation;
+    let sprintAnimation;
+    let jumpAnimation;
+    let lookAnimation;
+    let deathAnimation;
+    function initializeAnimations(coat) {
+        walkAnimation = new ƒAid.SpriteSheetAnimation("Walk", coat);
+        walkAnimation.generateByGrid(ƒ.Rectangle.GET(0, 0, 16, 24), 2, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(16));
+        sprintAnimation = new ƒAid.SpriteSheetAnimation("Sprint", coat);
+        sprintAnimation.generateByGrid(ƒ.Rectangle.GET(0, 24, 16, 24), 2, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(16));
+        jumpAnimation = new ƒAid.SpriteSheetAnimation("Jump", coat);
+        jumpAnimation.generateByGrid(ƒ.Rectangle.GET(0, 48, 16, 24), 2, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(16));
+        lookAnimation = new ƒAid.SpriteSheetAnimation("Look", coat);
+        lookAnimation.generateByGrid(ƒ.Rectangle.GET(32, 0, 16, 24), 2, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(16));
+        deathAnimation = new ƒAid.SpriteSheetAnimation("Death", coat);
+        deathAnimation.generateByGrid(ƒ.Rectangle.GET(32, 24, 16, 24), 2, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(16));
+    }
     // Load Sprite
-    let spriteNode;
-    let animation;
+    let player;
     async function hndLoad(_event) {
         let imgSpriteSheet = new ƒ.TextureImage();
-        await imgSpriteSheet.load("./Images/Mario_Walk.png");
+        await imgSpriteSheet.load("./Images/Mario_Spritesheet.png");
         let coat = new ƒ.CoatTextured(undefined, imgSpriteSheet);
-        animation = new ƒAid.SpriteSheetAnimation("Walk", coat);
-        animation.generateByGrid(ƒ.Rectangle.GET(0, 16, 16, 16), 3, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(17));
-        spriteNode = new ƒAid.NodeSprite("Sprite");
-        spriteNode.addComponent(new ƒ.ComponentTransform(new ƒ.Matrix4x4()));
-        spriteNode.setAnimation(animation);
-        spriteNode.setFrameDirection(1);
-        spriteNode.framerate = 8;
-        spriteNode.mtxLocal.translateY(-.3);
-        spriteNode.mtxLocal.translateX(-1);
-        spriteNode.mtxLocal.translateZ(1.001);
+        initializeAnimations(coat);
+        player = new ƒAid.NodeSprite("Sprite");
+        player.addComponent(new ƒ.ComponentTransform(new ƒ.Matrix4x4()));
+        player.setAnimation(walkAnimation);
+        player.setFrameDirection(1);
+        player.framerate = 20;
+        player.mtxLocal.translateY(-.3);
+        player.mtxLocal.translateX(-1);
+        player.mtxLocal.translateZ(1.001);
         let branch = viewport.getBranch();
         let mario = branch.getChildrenByName("Mario")[0];
-        mario.addChild(spriteNode);
+        mario.addChild(player);
         ƒ.Loop.addEventListener("loopFrame" /* ƒ.EVENT.LOOP_FRAME */, update);
         ƒ.Loop.start(ƒ.LOOP_MODE.TIME_GAME, 30);
     }
     let leftDirection = false;
-    let lastDirection = false;
-    let walkSpeed = 1;
+    let lastLeftDirection = false;
+    let speed = .8;
+    let prevSprint = false;
     function update(_event) {
-        let amount = walkSpeed * ƒ.Loop.timeFrameGame / 1000;
+        speed = .9;
+        if (leftDirection) {
+            speed = -.9;
+        }
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SHIFT_LEFT, ƒ.KEYBOARD_CODE.SHIFT_RIGHT])) {
+            speed = 2;
+            if (leftDirection) {
+                speed = -2;
+            }
+        }
+        // Calculate (walk) speed
+        const amount = speed * ƒ.Loop.timeFrameGame / 1000;
+        // Check for key presses
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT])) {
-            spriteNode.mtxLocal.translateX(-amount);
+            player.mtxLocal.translateX(-amount);
             leftDirection = true;
-            spriteNode.setFrameDirection(1);
+            player.setFrameDirection(1);
+            if (speed < -1) {
+                if (!prevSprint) {
+                    prevSprint = true;
+                    player.setAnimation(sprintAnimation);
+                }
+            }
+            else {
+                prevSprint = false;
+            }
         }
         else if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT])) {
-            spriteNode.mtxLocal.translateX(amount);
+            player.mtxLocal.translateX(amount);
             leftDirection = false;
-            spriteNode.setFrameDirection(1);
+            player.setFrameDirection(1);
+            if (speed > 1) {
+                if (!prevSprint) {
+                    prevSprint = true;
+                    player.setAnimation(sprintAnimation);
+                }
+            }
+            else {
+                prevSprint = false;
+            }
+        }
+        else if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP])) {
+            player.setAnimation(lookAnimation);
+            player.showFrame(1);
+        }
+        else if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])) {
+            player.setAnimation(lookAnimation);
+            player.showFrame(0);
         }
         else {
-            spriteNode.showFrame(0);
+            player.showFrame(0);
+            player.setAnimation(walkAnimation);
         }
-        if (leftDirection && !lastDirection) {
-            spriteNode.mtxLocal.rotation = ƒ.Vector3.Y(180);
-            lastDirection = true;
-            walkSpeed = -walkSpeed;
+        // Rotate based on direction
+        if (leftDirection && !lastLeftDirection) {
+            // turn left
+            player.mtxLocal.rotation = ƒ.Vector3.Y(180);
+            lastLeftDirection = true;
         }
-        else if (!leftDirection && lastDirection) {
-            spriteNode.mtxLocal.rotation = ƒ.Vector3.Y(0);
-            lastDirection = false;
-            walkSpeed = -walkSpeed;
+        else if (!leftDirection && lastLeftDirection) {
+            // turn right
+            player.mtxLocal.rotation = ƒ.Vector3.Y(0);
+            lastLeftDirection = false;
         }
         viewport.draw();
-        ƒ.AudioManager.default.update();
+        //ƒ.AudioManager.default.update();
     }
 })(Script || (Script = {}));
 //# sourceMappingURL=Script.js.map
