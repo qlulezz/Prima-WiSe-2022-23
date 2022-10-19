@@ -1,4 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
+@font-face {
+  font-family: 'Super Mario World';
+  src: URL('Super-Mario-World.ttf') format('truetype');
+}
 
 :root {
   --clr-bg: hsl(0, 0%, 7%);
@@ -87,7 +91,7 @@ body {
   background-repeat: no-repeat;
   background-position: bottom center;
   background-size: cover;
-  font-family: 'Silkscreen', cursive, sans-serif;
+  font-family: 'Super Mario World', 'Silkscreen', cursive, sans-serif;
   text-align: center;
 }
 
@@ -100,4 +104,22 @@ dialog {
 canvas.fullscreen {
   width: 100vw;
   height: 100vh;
+}
+
+.blink {
+  font-size: 1.2em;
+  animation: blink-animation 1s steps(2, start) infinite;
+  -webkit-animation: blink-animation 1s steps(2, start) infinite;
+}
+
+@keyframes blink-animation {
+  to {
+    visibility: hidden;
+  }
+}
+
+@-webkit-keyframes blink-animation {
+  to {
+    visibility: hidden;
+  }
 }
