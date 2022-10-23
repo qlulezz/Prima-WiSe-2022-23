@@ -61,14 +61,6 @@
             "name": "Tree",
             "idSource": "Graph|2022-10-12T19:07:09.324Z|84928"
           }
-        },
-        {
-          "ƒ.Node": {
-            "name": "Mario",
-            "active": true,
-            "components": {},
-            "children": []
-          }
         }
       ],
       "idResource": "Graph|2022-10-06T13:16:37.701Z|35847",
@@ -85,7 +77,7 @@
             "ƒ.ComponentMesh": {
               "idMesh": "MeshQuad|2022-10-10T09:59:10.394Z|47846",
               "pivot": {
-                "translation": "[0, -0.8000000715255737, 1]",
+                "translation": "[0, -0.5, 0]",
                 "rotation": "[0, 0, 0]",
                 "scaling": "[8, 1, 1]"
               },
@@ -215,7 +207,7 @@
             "ƒ.ComponentMesh": {
               "idMesh": "MeshQuad|2022-10-12T19:07:31.114Z|48377",
               "pivot": {
-                "translation": "[1, 0.41999995708465576, 0.9990000128746033]",
+                "translation": "[1, 0.725, -0.001]",
                 "rotation": "[0, 0, 0]",
                 "scaling": "[1.2500001192092896, 1.4500000476837158, 1]"
               },
