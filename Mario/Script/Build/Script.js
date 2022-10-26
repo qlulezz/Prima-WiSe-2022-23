@@ -42,6 +42,7 @@ var Script;
     var ƒAid = FudgeAid;
     // Initialize Viewport
     let viewport;
+    let branch;
     document.addEventListener("interactiveViewportStarted", start);
     function start(_event) {
         viewport = _event.detail;
@@ -79,81 +80,58 @@ var Script;
         avatar.mtxLocal.translateY(0);
         avatar.mtxLocal.translateX(-1);
         avatar.mtxLocal.translateZ(0.001);
-        let branch = viewport.getBranch();
+        branch = viewport.getBranch();
         branch.addChild(avatar);
         ƒ.Loop.addEventListener("loopFrame" /* ƒ.EVENT.LOOP_FRAME */, update);
         ƒ.Loop.start(ƒ.LOOP_MODE.FRAME_REQUEST, 30);
     }
     const xSpeedDefault = .9;
     const xSpeedSprint = 2;
-    const jumpForce = 0.05;
+    const jumpForce = 4.5;
     let ySpeed = 0;
-    let gravity = 0.1;
-    let leftDirection = false;
-    let prevSprint = false;
+    let gravity = 9.81;
+    let animationState = "stand";
+    let dead = false;
     function update(_event) {
         let deltaTime = ƒ.Loop.timeFrameGame / 1000;
         ySpeed -= gravity * deltaTime;
-        avatar.mtxLocal.translateY(ySpeed);
+        let yOffset = ySpeed * deltaTime;
+        avatar.mtxLocal.translateY(yOffset);
+        // Check for death
         let pos = avatar.mtxLocal.translation;
-        if (pos.y + ySpeed > 0)
-            avatar.mtxLocal.translateY(ySpeed);
+        if (dead) {
+            pos.y = -1;
+            ƒ.Time.game.setTimer(1000, 1, () => window.location.reload());
+            viewport.draw();
+            return;
+        }
+        if (pos.y < -1 && !dead) {
+            dead = true;
+            avatar.setAnimation(animDeath);
+            ySpeed = jumpForce * .8;
+            viewport.draw();
+            return;
+        }
+        /*
+        let pos: ƒ.Vector3 = avatar.mtxLocal.translation;
+        if (pos.y + yOffset > 0)
+          avatar.mtxLocal.translateY(yOffset);
         else {
-            ySpeed = 0;
-            pos.y = 0;
-            avatar.mtxLocal.translation = pos;
-        }
+          ySpeed = 0;
+          pos.y = 0;
+          avatar.mtxLocal.translation = pos;
+        } */
+        // Check if blocks are below player
+        checkCollision();
         let speed = xSpeedDefault;
-        if (leftDirection)
-            speed = -xSpeedDefault;
-        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SHIFT_LEFT, ƒ.KEYBOARD_CODE.SHIFT_RIGHT])) {
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SHIFT_LEFT, ƒ.KEYBOARD_CODE.SHIFT_RIGHT]))
             speed = xSpeedSprint;
-            if (leftDirection)
-                speed = -xSpeedSprint;
-        }
         // Calculate (walk) speed
         const moveDistance = speed * ƒ.Loop.timeFrameGame / 1000;
-        // Check for key presses
-        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT])) {
-            avatar.mtxLocal.translateX(-moveDistance);
-            leftDirection = true;
-            if (speed < -1) {
-                if (!prevSprint) {
-                    prevSprint = true;
-                    avatar.setAnimation(animSprint);
-                }
-            }
-            else {
-                prevSprint = false;
-            }
-        }
-        else if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT])) {
-            avatar.mtxLocal.translateX(moveDistance);
-            leftDirection = false;
-            if (speed > 1) {
-                if (!prevSprint) {
-                    prevSprint = true;
-                    avatar.setAnimation(animSprint);
-                }
-            }
-            else {
-                prevSprint = false;
-            }
-        }
-        else if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP])) {
-            avatar.setAnimation(animLook);
-            avatar.showFrame(1);
-        }
-        else if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])) {
-            avatar.setAnimation(animLook);
-            avatar.showFrame(0);
-        }
-        else {
-            avatar.setAnimation(animWalk);
-            avatar.showFrame(0);
-        }
+        // Check for key presses and move player accordingly
+        checkInput(moveDistance, speed);
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && ySpeed === 0) {
-            avatar.mtxLocal.translation = new ƒ.Vector3(pos.x, 0, 0.001);
+            //avatar.mtxLocal.translation = new ƒ.Vector3(pos.x, 0, 0.001);
             ySpeed = jumpForce;
         }
         if (ySpeed > 0) {
@@ -165,9 +143,71 @@ var Script;
             avatar.showFrame(1);
         }
         // Rotate based on direction
-        avatar.mtxLocal.rotation = ƒ.Vector3.Y(leftDirection ? 180 : 0);
+        avatar.mtxLocal.rotation = ƒ.Vector3.Y(animationState.includes("Left") ? 180 : 0);
         viewport.draw();
         //ƒ.AudioManager.default.update();
+    }
+    function checkInput(moveDistance, speed) {
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT])) {
+            avatar.mtxLocal.translateX(moveDistance);
+            if (speed > xSpeedDefault && animationState !== "sprintRight") {
+                avatar.setAnimation(animSprint);
+                animationState = "sprintRight";
+                return;
+            }
+            if (speed <= xSpeedDefault && animationState !== "walkRight") {
+                avatar.setAnimation(animWalk);
+                animationState = "walkRight";
+                return;
+            }
+            return;
+        }
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT])) {
+            avatar.mtxLocal.translateX(moveDistance);
+            if (speed > xSpeedDefault && animationState !== "sprintLeft") {
+                avatar.setAnimation(animSprint);
+                animationState = "sprintLeft";
+                return;
+            }
+            if (speed <= xSpeedDefault && animationState !== "walkLeft") {
+                avatar.setAnimation(animWalk);
+                animationState = "walkLeft";
+                return;
+            }
+            return;
+        }
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP]) && !animationState.includes("look")) {
+            animationState = `look ${animationState.includes("Left") && "Left"}`;
+            avatar.setAnimation(animLook);
+            avatar.showFrame(1);
+            return;
+        }
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]) && !animationState.includes("duck")) {
+            animationState = `duck ${animationState.includes("Left") && "Left"}`;
+            avatar.setAnimation(animLook);
+            avatar.showFrame(0);
+            return;
+        }
+        if (animationState.includes("stand")) {
+            avatar.setAnimation(animWalk);
+            avatar.showFrame(0);
+            return;
+        }
+        animationState = `stand ${animationState.includes("Left") && "Left"}`;
+    }
+    function checkCollision() {
+        let blocks = branch.getChildrenByName("Blocks")[0];
+        let pos = avatar.mtxLocal.translation;
+        for (let block of blocks.getChildren()) {
+            let posBlock = block.mtxLocal.translation;
+            if (Math.abs(pos.x - posBlock.x) < 0.5) {
+                if (pos.y < posBlock.y + 0.5) {
+                    pos.y = posBlock.y + 0.5;
+                    avatar.mtxLocal.translation = pos;
+                    ySpeed = 0;
+                }
+            }
+        }
     }
 })(Script || (Script = {}));
 //# sourceMappingURL=Script.js.map
