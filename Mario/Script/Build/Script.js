@@ -42,7 +42,7 @@ var Script;
     var ƒAid = FudgeAid;
     // Initialize Viewport
     let viewport;
-    let branch;
+    let graph;
     document.addEventListener("interactiveViewportStarted", start);
     function start(_event) {
         viewport = _event.detail;
@@ -65,13 +65,24 @@ var Script;
         animDeath = new ƒAid.SpriteSheetAnimation("Death", coat);
         animDeath.generateByGrid(ƒ.Rectangle.GET(32, 24, 16, 24), 2, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(16));
     }
-    // Load Sprite
+    // Sounds from https://themushroomkingdom.net/media/smw/wav
+    // Music https://www.youtube.com/watch?v=tAaGKo4XVvM
+    let audioJump;
+    let audioDeath;
+    function initializeSounds() {
+        audioJump = new ƒ.Audio("./Sounds/smw_jump.wav");
+        audioDeath = new ƒ.Audio("./Sounds/smw_lost_a_life.wav");
+    }
+    // Load Mario Sprite and Audio
     let avatar;
+    let cmpAudio;
+    let clouds;
     async function hndLoad(_event) {
         let imgSpriteSheet = new ƒ.TextureImage();
         await imgSpriteSheet.load("./Images/Mario_Spritesheet.png");
         let coat = new ƒ.CoatTextured(undefined, imgSpriteSheet);
         initializeAnimations(coat);
+        initializeSounds();
         avatar = new ƒAid.NodeSprite("Avatar");
         avatar.addComponent(new ƒ.ComponentTransform(new ƒ.Matrix4x4()));
         avatar.setAnimation(animWalk);
@@ -80,8 +91,12 @@ var Script;
         avatar.mtxLocal.translateY(0);
         avatar.mtxLocal.translateX(-1);
         avatar.mtxLocal.translateZ(0.001);
-        branch = viewport.getBranch();
-        branch.addChild(avatar);
+        graph = viewport.getBranch();
+        graph.addChild(avatar);
+        clouds = graph.getChildrenByName("Clouds")[0].getComponent(ƒ.ComponentMaterial);
+        cmpAudio = graph.getComponent(ƒ.ComponentAudio);
+        cmpAudio.connect(true);
+        cmpAudio.volume = 1;
         ƒ.Loop.addEventListener("loopFrame" /* ƒ.EVENT.LOOP_FRAME */, update);
         ƒ.Loop.start(ƒ.LOOP_MODE.FRAME_REQUEST, 30);
     }
@@ -99,53 +114,59 @@ var Script;
         avatar.mtxLocal.translateY(yOffset);
         // Check for death
         let pos = avatar.mtxLocal.translation;
-        if (dead) {
-            pos.y = -1;
-            ƒ.Time.game.setTimer(1000, 1, () => window.location.reload());
-            viewport.draw();
-            return;
-        }
         if (pos.y < -1 && !dead) {
             dead = true;
+            cmpAudio.setAudio(audioDeath);
+            cmpAudio.play(true);
             avatar.setAnimation(animDeath);
             ySpeed = jumpForce * .8;
             viewport.draw();
             return;
         }
-        /*
-        let pos: ƒ.Vector3 = avatar.mtxLocal.translation;
-        if (pos.y + yOffset > 0)
-          avatar.mtxLocal.translateY(yOffset);
-        else {
-          ySpeed = 0;
-          pos.y = 0;
-          avatar.mtxLocal.translation = pos;
-        } */
+        // If dead, stop game and reset page
+        if (dead) {
+            cmpAudio.volume = 10;
+            pos.y = -1;
+            ƒ.Time.game.setTimer(3000, 1, () => window.location.reload());
+            viewport.draw();
+            return;
+        }
         // Check if blocks are below player
         checkCollision();
         let speed = xSpeedDefault;
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SHIFT_LEFT, ƒ.KEYBOARD_CODE.SHIFT_RIGHT]))
             speed = xSpeedSprint;
-        // Calculate (walk) speed
+        // Calculate travel distance
         const moveDistance = speed * ƒ.Loop.timeFrameGame / 1000;
         // Check for key presses and move player accordingly
         checkInput(moveDistance, speed);
+        // Rotate based on direction
+        avatar.mtxLocal.rotation = ƒ.Vector3.Y(animationState.includes("Left") ? 180 : 0);
+        // Jumping
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && ySpeed === 0) {
-            //avatar.mtxLocal.translation = new ƒ.Vector3(pos.x, 0, 0.001);
             ySpeed = jumpForce;
+            cmpAudio.volume = 6;
+            cmpAudio.setAudio(audioJump);
+            cmpAudio.play(true);
         }
         if (ySpeed > 0) {
+            animationState = "jump";
             avatar.setAnimation(animJump);
             avatar.showFrame(0);
         }
         else if (ySpeed < 0) {
+            animationState = "jump";
             avatar.setAnimation(animJump);
             avatar.showFrame(1);
         }
-        // Rotate based on direction
-        avatar.mtxLocal.rotation = ƒ.Vector3.Y(animationState.includes("Left") ? 180 : 0);
+        if (ySpeed === 0 && animationState.includes("jump")) {
+            avatar.setAnimation(animWalk);
+            animationState = "walk";
+        }
+        // Move clouds
+        clouds.mtxPivot.translateX(.0001);
         viewport.draw();
-        //ƒ.AudioManager.default.update();
+        ƒ.AudioManager.default.update();
     }
     function checkInput(moveDistance, speed) {
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT])) {
@@ -196,7 +217,7 @@ var Script;
         animationState = `stand ${animationState.includes("Left") && "Left"}`;
     }
     function checkCollision() {
-        let blocks = branch.getChildrenByName("Blocks")[0];
+        let blocks = graph.getChildrenByName("Blocks")[0];
         let pos = avatar.mtxLocal.translation;
         for (let block of blocks.getChildren()) {
             let posBlock = block.mtxLocal.translation;

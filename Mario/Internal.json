@@ -5,11 +5,31 @@
       "name": "MeshQuad"
     }
   },
+  "Audio|2022-10-27T12:32:19.509Z|64869": {
+    "ƒ.Audio": {
+      "url": "Sounds\\smw_jump.wav",
+      "idResource": "Audio|2022-10-27T12:32:19.509Z|64869",
+      "name": "Sounds\\smw_jump.wav",
+      "type": "Audio"
+    }
+  },
   "Graph|2022-10-06T13:16:37.701Z|35847": {
     "ƒ.Graph": {
       "name": "Level",
       "active": true,
-      "components": {},
+      "components": {
+        "ComponentAudio": [
+          {
+            "ƒ.ComponentAudio": {
+              "active": true,
+              "idResource": "Audio|2022-10-27T12:32:19.509Z|64869",
+              "playing": false,
+              "loop": false,
+              "volume": 1
+            }
+          }
+        ]
+      },
       "children": [
         {
           "ƒ.GraphInstance": {
@@ -102,7 +122,7 @@
                       {
                         "ƒ.ComponentTransform": {
                           "local": {
-                            "translation": "[1, -0.5, 0]",
+                            "translation": "[2, -0.5, 0]",
                             "rotation": "[0, 0, 0]",
                             "scaling": "[1, 1, 1]"
                           },
@@ -164,7 +184,7 @@
                       {
                         "ƒ.ComponentTransform": {
                           "local": {
-                            "translation": "[2, -0.20000001788139343, 0]",
+                            "translation": "[-3, -0.5, 0]",
                             "rotation": "[0, 0, 0]",
                             "scaling": "[1, 1, 1]"
                           },
@@ -195,7 +215,7 @@
                       {
                         "ƒ.ComponentTransform": {
                           "local": {
-                            "translation": "[3, 0.10000000149011612, 0]",
+                            "translation": "[3, -0.5, 0]",
                             "rotation": "[0, 0, 0]",
                             "scaling": "[1, 1, 1]"
                           },
@@ -218,6 +238,55 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "ƒ.GraphInstance": {
+            "deserializeFromSource": true,
+            "name": "Clouds",
+            "idSource": "Graph|2022-10-27T18:50:55.086Z|81254"
+          }
+        },
+        {
+          "ƒ.Node": {
+            "name": "Controls",
+            "active": true,
+            "components": {
+              "ComponentMesh": [
+                {
+                  "ƒ.ComponentMesh": {
+                    "idMesh": "MeshQuad|2022-10-11T14:26:57.720Z|26125",
+                    "pivot": {
+                      "translation": "[0, 0.9000000953674316, 0]",
+                      "rotation": "[0, 0, 0]",
+                      "scaling": "[2, 0.6599999666213989, 1]"
+                    },
+                    "Component": {
+                      "active": true
+                    }
+                  }
+                }
+              ],
+              "ComponentMaterial": [
+                {
+                  "ƒ.ComponentMaterial": {
+                    "sortForAlpha": false,
+                    "clrPrimary": "[1, 1, 1, 1]",
+                    "clrSecondary": "[1, 1, 1, 1]",
+                    "pivot": {
+                      "translation": "[0, 0]",
+                      "rotation": 0,
+                      "scaling": "[1, 1]"
+                    },
+                    "Component": {
+                      "active": true
+                    },
+                    "idMaterial": "Material|2022-10-27T19:49:46.028Z|83899"
+                  }
+                }
+              ]
+            },
+            "children": []
           }
         }
       ],
@@ -249,7 +318,7 @@
               "pivot": {
                 "translation": "[0, 0, -1]",
                 "rotation": "[0, 0, 0]",
-                "scaling": "[10, 6, 1]"
+                "scaling": "[20, 20, 1]"
               },
               "Component": {
                 "active": true
@@ -315,7 +384,7 @@
             "ƒ.ComponentMesh": {
               "idMesh": "MeshQuad|2022-10-11T14:26:57.720Z|26125",
               "pivot": {
-                "translation": "[1, 0.7250000238418579, 0]",
+                "translation": "[-2, 0.7250000238418579, 0]",
                 "rotation": "[0, 0, 0]",
                 "scaling": "[1.2500001192092896, 1.4500000476837158, 1]"
               },
@@ -415,6 +484,98 @@
       "children": [],
       "idResource": "Graph|2022-10-25T14:53:53.981Z|71729",
       "type": "Graph"
+    }
+  },
+  "TextureImage|2022-10-27T18:50:21.866Z|76935": {
+    "ƒ.TextureImage": {
+      "url": "Images\\Clouds.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2022-10-27T18:50:21.866Z|76935",
+        "name": "Images\\Clouds.png",
+        "mipmap": "CRISP"
+      }
+    }
+  },
+  "Material|2022-10-27T18:51:16.685Z|92131": {
+    "ƒ.Material": {
+      "name": "ShaderClouds",
+      "idResource": "Material|2022-10-27T18:51:16.685Z|92131",
+      "shader": "ShaderLitTextured",
+      "coat": {
+        "ƒ.CoatTextured": {
+          "color": "[1, 1, 1, 0.64]",
+          "idTexture": "TextureImage|2022-10-27T18:50:21.866Z|76935"
+        }
+      }
+    }
+  },
+  "Graph|2022-10-27T18:50:55.086Z|81254": {
+    "ƒ.Graph": {
+      "name": "Clouds",
+      "active": true,
+      "components": {
+        "ComponentMesh": [
+          {
+            "ƒ.ComponentMesh": {
+              "idMesh": "MeshQuad|2022-10-11T14:26:57.720Z|26125",
+              "pivot": {
+                "translation": "[0, 1.600000023841858, -0.49999991059303284]",
+                "rotation": "[0, 0, 0]",
+                "scaling": "[8.000001907348633, 1.7000001668930054, 1]"
+              },
+              "Component": {
+                "active": true
+              }
+            }
+          }
+        ],
+        "ComponentMaterial": [
+          {
+            "ƒ.ComponentMaterial": {
+              "sortForAlpha": false,
+              "clrPrimary": "[1, 1, 1, 1]",
+              "clrSecondary": "[1, 1, 1, 1]",
+              "pivot": {
+                "translation": "[0, 0]",
+                "rotation": 0,
+                "scaling": "[1, 1]"
+              },
+              "Component": {
+                "active": true
+              },
+              "idMaterial": "Material|2022-10-27T18:51:16.685Z|92131"
+            }
+          }
+        ]
+      },
+      "children": [],
+      "idResource": "Graph|2022-10-27T18:50:55.086Z|81254",
+      "type": "Graph"
+    }
+  },
+  "TextureImage|2022-10-27T19:49:16.875Z|85260": {
+    "ƒ.TextureImage": {
+      "url": "Images\\Controls.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2022-10-27T19:49:16.875Z|85260",
+        "name": "Images\\Controls.png",
+        "mipmap": "CRISP"
+      }
+    }
+  },
+  "Material|2022-10-27T19:49:46.028Z|83899": {
+    "ƒ.Material": {
+      "name": "ShaderControls",
+      "idResource": "Material|2022-10-27T19:49:46.028Z|83899",
+      "shader": "ShaderLitTextured",
+      "coat": {
+        "ƒ.CoatTextured": {
+          "color": "[1, 1, 1, 1]",
+          "idTexture": "TextureImage|2022-10-27T19:49:16.875Z|85260"
+        }
+      }
     }
   }
 }

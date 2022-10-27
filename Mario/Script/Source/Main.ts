@@ -4,7 +4,7 @@ namespace Script {
 
   // Initialize Viewport
   let viewport: ƒ.Viewport;
-  let branch: ƒ.Node;
+  let graph: ƒ.Node;
   document.addEventListener("interactiveViewportStarted", <EventListener>start);
 
   function start(_event: CustomEvent): void {
@@ -35,14 +35,27 @@ namespace Script {
     animDeath.generateByGrid(ƒ.Rectangle.GET(32, 24, 16, 24), 2, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(16));
   }
 
-  // Load Sprite
+  // Sounds from https://themushroomkingdom.net/media/smw/wav
+  // Music https://www.youtube.com/watch?v=tAaGKo4XVvM
+  let audioJump: ƒ.Audio;
+  let audioDeath: ƒ.Audio;
+
+  function initializeSounds(): void {
+    audioJump = new ƒ.Audio("./Sounds/smw_jump.wav");
+    audioDeath = new ƒ.Audio("./Sounds/smw_lost_a_life.wav");
+  }
+
+  // Load Mario Sprite and Audio
   let avatar: ƒAid.NodeSprite;
+  let cmpAudio: ƒ.ComponentAudio;
+  let clouds: ƒ.ComponentMaterial;
   async function hndLoad(_event: Event): Promise<void> {
     let imgSpriteSheet: ƒ.TextureImage = new ƒ.TextureImage();
     await imgSpriteSheet.load("./Images/Mario_Spritesheet.png");
     let coat: ƒ.CoatTextured = new ƒ.CoatTextured(undefined, imgSpriteSheet);
 
     initializeAnimations(coat);
+    initializeSounds();
 
     avatar = new ƒAid.NodeSprite("Avatar");
     avatar.addComponent(new ƒ.ComponentTransform(new ƒ.Matrix4x4()));
@@ -54,8 +67,13 @@ namespace Script {
     avatar.mtxLocal.translateX(-1);
     avatar.mtxLocal.translateZ(0.001);
 
-    branch = viewport.getBranch();
-    branch.addChild(avatar);
+    graph = viewport.getBranch();
+    graph.addChild(avatar);
+    clouds = graph.getChildrenByName("Clouds")[0].getComponent(ƒ.ComponentMaterial);
+
+    cmpAudio = graph.getComponent(ƒ.ComponentAudio);
+    cmpAudio.connect(true);
+    cmpAudio.volume = 1;
 
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start(ƒ.LOOP_MODE.FRAME_REQUEST, 30);
@@ -78,29 +96,23 @@ namespace Script {
 
     // Check for death
     let pos: ƒ.Vector3 = avatar.mtxLocal.translation;
-    if (dead) {
-      pos.y = -1;
-      ƒ.Time.game.setTimer(1000, 1, () => window.location.reload());
-      viewport.draw();
-      return;
-    }
     if (pos.y < -1 && !dead) {
       dead = true;
+      cmpAudio.setAudio(audioDeath);
+      cmpAudio.play(true);
       avatar.setAnimation(animDeath);
       ySpeed = jumpForce * .8;
       viewport.draw();
       return;
     }
-
-    /*
-    let pos: ƒ.Vector3 = avatar.mtxLocal.translation;
-    if (pos.y + yOffset > 0)
-      avatar.mtxLocal.translateY(yOffset);
-    else {
-      ySpeed = 0;
-      pos.y = 0;
-      avatar.mtxLocal.translation = pos;
-    } */
+    // If dead, stop game and reset page
+    if (dead) {
+      cmpAudio.volume = 10;
+      pos.y = -1;
+      ƒ.Time.game.setTimer(3000, 1, () => window.location.reload());
+      viewport.draw();
+      return;
+    }
 
     // Check if blocks are below player
     checkCollision();
@@ -109,30 +121,43 @@ namespace Script {
     if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SHIFT_LEFT, ƒ.KEYBOARD_CODE.SHIFT_RIGHT]))
       speed = xSpeedSprint;
 
-    // Calculate (walk) speed
+    // Calculate travel distance
     const moveDistance = speed * ƒ.Loop.timeFrameGame / 1000;
 
     // Check for key presses and move player accordingly
     checkInput(moveDistance, speed);
 
+    // Rotate based on direction
+    avatar.mtxLocal.rotation = ƒ.Vector3.Y(animationState.includes("Left") ? 180 : 0);
+
+    // Jumping
     if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && ySpeed === 0) {
-      //avatar.mtxLocal.translation = new ƒ.Vector3(pos.x, 0, 0.001);
       ySpeed = jumpForce;
+      cmpAudio.volume = 6;
+      cmpAudio.setAudio(audioJump);
+      cmpAudio.play(true);
     }
 
     if (ySpeed > 0) {
+      animationState = "jump";
       avatar.setAnimation(animJump);
       avatar.showFrame(0);
     } else if (ySpeed < 0) {
+      animationState = "jump";
       avatar.setAnimation(animJump);
       avatar.showFrame(1);
     }
 
-    // Rotate based on direction
-    avatar.mtxLocal.rotation = ƒ.Vector3.Y(animationState.includes("Left") ? 180 : 0);
+    if (ySpeed === 0 && animationState.includes("jump")) {
+      avatar.setAnimation(animWalk);
+      animationState = "walk";
+    }
+
+    // Move clouds
+    clouds.mtxPivot.translateX(.0001);
 
     viewport.draw();
-    //ƒ.AudioManager.default.update();
+    ƒ.AudioManager.default.update();
   }
 
   function checkInput(moveDistance: number, speed: number): void {
@@ -186,7 +211,7 @@ namespace Script {
   }
 
   function checkCollision(): void {
-    let blocks: ƒ.Node = branch.getChildrenByName("Blocks")[0];
+    let blocks: ƒ.Node = graph.getChildrenByName("Blocks")[0];
     let pos: ƒ.Vector3 = avatar.mtxLocal.translation;
     for (let block of blocks.getChildren()) {
       let posBlock: ƒ.Vector3 = block.mtxLocal.translation;
