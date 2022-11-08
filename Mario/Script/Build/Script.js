@@ -1,8 +1,136 @@
 "use strict";
-var Script;
-(function (Script) {
+var Mario;
+(function (Mario) {
     var ƒ = FudgeCore;
-    ƒ.Project.registerScriptNamespace(Script); // Register the namespace to FUDGE for serialization
+    var ƒAid = FudgeAid;
+    class Avatar extends ƒAid.NodeSprite {
+        xSpeedDefault = .9;
+        xSpeedSprint = 2;
+        jumpForce = 4.5;
+        ySpeed = 0;
+        speed = this.xSpeedDefault;
+        animationState = "stand";
+        dead = false;
+        animWalk;
+        animSprint;
+        animJump;
+        animLook;
+        animDeath;
+        // Sounds from https://themushroomkingdom.net/media/smw/wav
+        // Music https://www.youtube.com/watch?v=tAaGKo4XVvM
+        audioJump;
+        audioDeath;
+        constructor() {
+            super("Avatar");
+            this.addComponent(new ƒ.ComponentTransform());
+        }
+        update(_deltaTime) {
+            this.ySpeed -= Mario.gravity * _deltaTime;
+            let yOffset = this.ySpeed * _deltaTime;
+            this.mtxLocal.translateY(yOffset);
+        }
+        reset() {
+            Mario.cmpAudio.volume = 6;
+            this.mtxLocal.set(new ƒ.Matrix4x4());
+            this.mtxLocal.translateY(0);
+            this.mtxLocal.translateX(-1);
+            this.mtxLocal.translateZ(0.001);
+            this.ySpeed = 0;
+            this.dead = false;
+        }
+        checkDeath() {
+            // Check for death
+            console.log(this.dead);
+            let pos = this.mtxLocal.translation;
+            if (pos.y < -1 && !this.dead) {
+                this.dead = true;
+                Mario.cmpAudio.setAudio(this.audioDeath);
+                Mario.cmpAudio.play(true);
+                this.setAnimation(this.animDeath);
+                this.ySpeed = this.jumpForce * .8;
+                Mario.viewport.draw();
+                return true;
+            }
+            // If dead, stop game and reset avatar
+            if (this.dead) {
+                Mario.cmpAudio.volume = 10;
+                pos.y = -1;
+                ƒ.Time.game.setTimer(3000, 1, () => {
+                    this.reset();
+                });
+                Mario.viewport.draw();
+                return true;
+            }
+            return false;
+        }
+        jump() {
+            this.ySpeed = this.jumpForce;
+            Mario.cmpAudio.volume = 6;
+            Mario.cmpAudio.setAudio(this.audioJump);
+            Mario.cmpAudio.play(true);
+        }
+        setJumpAnimation() {
+            if (this.ySpeed > 0) {
+                this.animationState = "jump";
+                this.setAnimation(this.animJump);
+                this.showFrame(0);
+            }
+            else if (this.ySpeed < 0) {
+                this.animationState = "jump";
+                this.setAnimation(this.animJump);
+                this.showFrame(1);
+            }
+            if (this.ySpeed === 0 && this.animationState.includes("jump")) {
+                this.setAnimation(this.animWalk);
+                this.animationState = "walk";
+            }
+        }
+        sprint(sprinting) {
+            this.speed = this.xSpeedDefault;
+            if (sprinting)
+                this.speed = this.xSpeedSprint;
+        }
+        // Check if blocks are below player
+        checkCollision() {
+            let blocks = Mario.graph.getChildrenByName("Blocks")[0];
+            let pos = this.mtxLocal.translation;
+            for (let block of blocks.getChildren()) {
+                let posBlock = block.mtxLocal.translation;
+                if (Math.abs(pos.x - posBlock.x) < 0.5) {
+                    if (pos.y < posBlock.y + 0.5) {
+                        pos.y = posBlock.y + 0.5;
+                        this.mtxLocal.translation = pos;
+                        this.ySpeed = 0;
+                    }
+                }
+            }
+        }
+        initializeSounds() {
+            this.audioJump = new ƒ.Audio("./Sounds/smw_jump.wav");
+            this.audioDeath = new ƒ.Audio("./Sounds/smw_lost_a_life.wav");
+        }
+        initializeAnimations(imgSpriteSheet) {
+            let coat = new ƒ.CoatTextured(undefined, imgSpriteSheet);
+            this.animWalk = new ƒAid.SpriteSheetAnimation("Walk", coat);
+            this.animWalk.generateByGrid(ƒ.Rectangle.GET(0, 0, 16, 24), 2, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(16));
+            this.animSprint = new ƒAid.SpriteSheetAnimation("Sprint", coat);
+            this.animSprint.generateByGrid(ƒ.Rectangle.GET(0, 24, 16, 24), 2, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(16));
+            this.animJump = new ƒAid.SpriteSheetAnimation("Jump", coat);
+            this.animJump.generateByGrid(ƒ.Rectangle.GET(64, 0, 16, 24), 2, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(16));
+            this.animLook = new ƒAid.SpriteSheetAnimation("Look", coat);
+            this.animLook.generateByGrid(ƒ.Rectangle.GET(32, 0, 16, 24), 2, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(16));
+            this.animDeath = new ƒAid.SpriteSheetAnimation("Death", coat);
+            this.animDeath.generateByGrid(ƒ.Rectangle.GET(32, 24, 16, 24), 2, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(16));
+            this.setAnimation(this.animWalk);
+            this.framerate = 20;
+        }
+    }
+    Mario.Avatar = Avatar;
+})(Mario || (Mario = {}));
+var Mario;
+(function (Mario) {
+    var ƒ = FudgeCore;
+    ƒ.Project.registerScriptNamespace(Mario); // Register the namespace to FUDGE for serialization
     class CustomComponentScript extends ƒ.ComponentScript {
         // Register the script as component for use in the editor via drag&drop
         static iSubclass = ƒ.Component.registerSubclass(CustomComponentScript);
@@ -34,201 +162,113 @@ var Script;
             }
         };
     }
-    Script.CustomComponentScript = CustomComponentScript;
-})(Script || (Script = {}));
-var Script;
-(function (Script) {
+    Mario.CustomComponentScript = CustomComponentScript;
+})(Mario || (Mario = {}));
+var Mario;
+(function (Mario) {
     var ƒ = FudgeCore;
-    var ƒAid = FudgeAid;
-    // Initialize Viewport
-    let viewport;
-    let graph;
     document.addEventListener("interactiveViewportStarted", start);
     function start(_event) {
-        viewport = _event.detail;
+        Mario.viewport = _event.detail;
         hndLoad(_event);
-    }
-    let animWalk;
-    let animSprint;
-    let animJump;
-    let animLook;
-    let animDeath;
-    function initializeAnimations(coat) {
-        animWalk = new ƒAid.SpriteSheetAnimation("Walk", coat);
-        animWalk.generateByGrid(ƒ.Rectangle.GET(0, 0, 16, 24), 2, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(16));
-        animSprint = new ƒAid.SpriteSheetAnimation("Sprint", coat);
-        animSprint.generateByGrid(ƒ.Rectangle.GET(0, 24, 16, 24), 2, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(16));
-        animJump = new ƒAid.SpriteSheetAnimation("Jump", coat);
-        animJump.generateByGrid(ƒ.Rectangle.GET(64, 0, 16, 24), 2, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(16));
-        animLook = new ƒAid.SpriteSheetAnimation("Look", coat);
-        animLook.generateByGrid(ƒ.Rectangle.GET(32, 0, 16, 24), 2, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(16));
-        animDeath = new ƒAid.SpriteSheetAnimation("Death", coat);
-        animDeath.generateByGrid(ƒ.Rectangle.GET(32, 24, 16, 24), 2, 64, ƒ.ORIGIN2D.BOTTOMCENTER, ƒ.Vector2.X(16));
-    }
-    // Sounds from https://themushroomkingdom.net/media/smw/wav
-    // Music https://www.youtube.com/watch?v=tAaGKo4XVvM
-    let audioJump;
-    let audioDeath;
-    function initializeSounds() {
-        audioJump = new ƒ.Audio("./Sounds/smw_jump.wav");
-        audioDeath = new ƒ.Audio("./Sounds/smw_lost_a_life.wav");
     }
     // Load Mario Sprite and Audio
     let avatar;
-    let cmpAudio;
     let clouds;
     async function hndLoad(_event) {
+        avatar = new Mario.Avatar();
         let imgSpriteSheet = new ƒ.TextureImage();
         await imgSpriteSheet.load("./Images/Mario_Spritesheet.png");
-        let coat = new ƒ.CoatTextured(undefined, imgSpriteSheet);
-        initializeAnimations(coat);
-        initializeSounds();
-        avatar = new ƒAid.NodeSprite("Avatar");
-        avatar.addComponent(new ƒ.ComponentTransform(new ƒ.Matrix4x4()));
-        avatar.setAnimation(animWalk);
-        avatar.setFrameDirection(1);
-        avatar.framerate = 20;
+        avatar.initializeAnimations(imgSpriteSheet);
+        avatar.initializeSounds();
         avatar.mtxLocal.translateY(0);
         avatar.mtxLocal.translateX(-1);
         avatar.mtxLocal.translateZ(0.001);
-        graph = viewport.getBranch();
-        graph.addChild(avatar);
-        clouds = graph.getChildrenByName("Clouds")[0].getComponent(ƒ.ComponentMaterial);
-        cmpAudio = graph.getComponent(ƒ.ComponentAudio);
-        cmpAudio.connect(true);
-        cmpAudio.volume = 1;
+        Mario.graph = Mario.viewport.getBranch();
+        Mario.graph.addChild(avatar);
+        clouds = Mario.graph.getChildrenByName("Clouds")[0].getComponent(ƒ.ComponentMaterial);
+        Mario.cmpAudio = Mario.graph.getComponent(ƒ.ComponentAudio);
+        Mario.cmpAudio.connect(true);
+        Mario.cmpAudio.volume = 1;
         ƒ.Loop.addEventListener("loopFrame" /* ƒ.EVENT.LOOP_FRAME */, update);
         ƒ.Loop.start(ƒ.LOOP_MODE.FRAME_REQUEST, 30);
     }
-    const xSpeedDefault = .9;
-    const xSpeedSprint = 2;
-    const jumpForce = 4.5;
-    let ySpeed = 0;
-    let gravity = 9.81;
-    let animationState = "stand";
-    let dead = false;
+    Mario.gravity = 9.81;
     function update(_event) {
         let deltaTime = ƒ.Loop.timeFrameGame / 1000;
-        ySpeed -= gravity * deltaTime;
-        let yOffset = ySpeed * deltaTime;
-        avatar.mtxLocal.translateY(yOffset);
-        // Check for death
-        let pos = avatar.mtxLocal.translation;
-        if (pos.y < -1 && !dead) {
-            dead = true;
-            cmpAudio.setAudio(audioDeath);
-            cmpAudio.play(true);
-            avatar.setAnimation(animDeath);
-            ySpeed = jumpForce * .8;
-            viewport.draw();
+        avatar.update(deltaTime);
+        // Check for death, if dead, stop game and reset
+        const dead = avatar.checkDeath();
+        if (dead)
             return;
-        }
-        // If dead, stop game and reset page
-        if (dead) {
-            cmpAudio.volume = 10;
-            pos.y = -1;
-            ƒ.Time.game.setTimer(3000, 1, () => window.location.reload());
-            viewport.draw();
-            return;
-        }
         // Check if blocks are below player
-        checkCollision();
-        let speed = xSpeedDefault;
+        avatar.checkCollision();
+        avatar.sprint(false);
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SHIFT_LEFT, ƒ.KEYBOARD_CODE.SHIFT_RIGHT]))
-            speed = xSpeedSprint;
-        // Calculate travel distance
-        const moveDistance = speed * ƒ.Loop.timeFrameGame / 1000;
+            avatar.sprint(true);
         // Check for key presses and move player accordingly
-        checkInput(moveDistance, speed);
+        checkInput(avatar);
         // Rotate based on direction
-        avatar.mtxLocal.rotation = ƒ.Vector3.Y(animationState.includes("Left") ? 180 : 0);
+        avatar.mtxLocal.rotation = ƒ.Vector3.Y(avatar.animationState.includes("Left") ? 180 : 0);
         // Jumping
-        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && ySpeed === 0) {
-            ySpeed = jumpForce;
-            cmpAudio.volume = 6;
-            cmpAudio.setAudio(audioJump);
-            cmpAudio.play(true);
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && avatar.ySpeed === 0) {
+            avatar.jump();
         }
-        if (ySpeed > 0) {
-            animationState = "jump";
-            avatar.setAnimation(animJump);
-            avatar.showFrame(0);
-        }
-        else if (ySpeed < 0) {
-            animationState = "jump";
-            avatar.setAnimation(animJump);
-            avatar.showFrame(1);
-        }
-        if (ySpeed === 0 && animationState.includes("jump")) {
-            avatar.setAnimation(animWalk);
-            animationState = "walk";
-        }
+        avatar.setJumpAnimation();
         // Move clouds
         clouds.mtxPivot.translateX(.0001);
-        viewport.draw();
+        Mario.viewport.draw();
         ƒ.AudioManager.default.update();
     }
-    function checkInput(moveDistance, speed) {
+    function checkInput(avatar) {
+        // Calculate travel distance
+        const moveDistance = avatar.speed * ƒ.Loop.timeFrameGame / 1000;
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT])) {
             avatar.mtxLocal.translateX(moveDistance);
-            if (speed > xSpeedDefault && animationState !== "sprintRight") {
-                avatar.setAnimation(animSprint);
-                animationState = "sprintRight";
+            if (avatar.speed > avatar.xSpeedDefault && avatar.animationState !== "sprintRight") {
+                avatar.setAnimation(avatar.animSprint);
+                avatar.animationState = "sprintRight";
                 return;
             }
-            if (speed <= xSpeedDefault && animationState !== "walkRight") {
-                avatar.setAnimation(animWalk);
-                animationState = "walkRight";
+            if (avatar.speed <= avatar.xSpeedDefault && avatar.animationState !== "walkRight") {
+                avatar.setAnimation(avatar.animWalk);
+                avatar.animationState = "walkRight";
                 return;
             }
             return;
         }
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT])) {
             avatar.mtxLocal.translateX(moveDistance);
-            if (speed > xSpeedDefault && animationState !== "sprintLeft") {
-                avatar.setAnimation(animSprint);
-                animationState = "sprintLeft";
+            if (avatar.speed > avatar.xSpeedDefault && avatar.animationState !== "sprintLeft") {
+                avatar.setAnimation(avatar.animSprint);
+                avatar.animationState = "sprintLeft";
                 return;
             }
-            if (speed <= xSpeedDefault && animationState !== "walkLeft") {
-                avatar.setAnimation(animWalk);
-                animationState = "walkLeft";
+            if (avatar.speed <= avatar.xSpeedDefault && avatar.animationState !== "walkLeft") {
+                avatar.setAnimation(avatar.animWalk);
+                avatar.animationState = "walkLeft";
                 return;
             }
             return;
         }
-        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP]) && !animationState.includes("look")) {
-            animationState = `look ${animationState.includes("Left") && "Left"}`;
-            avatar.setAnimation(animLook);
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP]) && !avatar.animationState.includes("look")) {
+            avatar.animationState = `look ${avatar.animationState.includes("Left") && "Left"}`;
+            avatar.setAnimation(avatar.animLook);
             avatar.showFrame(1);
             return;
         }
-        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]) && !animationState.includes("duck")) {
-            animationState = `duck ${animationState.includes("Left") && "Left"}`;
-            avatar.setAnimation(animLook);
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]) && !avatar.animationState.includes("duck")) {
+            avatar.animationState = `duck ${avatar.animationState.includes("Left") && "Left"}`;
+            avatar.setAnimation(avatar.animLook);
             avatar.showFrame(0);
             return;
         }
-        if (animationState.includes("stand")) {
-            avatar.setAnimation(animWalk);
+        if (avatar.animationState.includes("stand")) {
+            avatar.setAnimation(avatar.animWalk);
             avatar.showFrame(0);
             return;
         }
-        animationState = `stand ${animationState.includes("Left") && "Left"}`;
+        avatar.animationState = `stand ${avatar.animationState.includes("Left") && "Left"}`;
     }
-    function checkCollision() {
-        let blocks = graph.getChildrenByName("Blocks")[0];
-        let pos = avatar.mtxLocal.translation;
-        for (let block of blocks.getChildren()) {
-            let posBlock = block.mtxLocal.translation;
-            if (Math.abs(pos.x - posBlock.x) < 0.5) {
-                if (pos.y < posBlock.y + 0.5) {
-                    pos.y = posBlock.y + 0.5;
-                    avatar.mtxLocal.translation = pos;
-                    ySpeed = 0;
-                }
-            }
-        }
-    }
-})(Script || (Script = {}));
+})(Mario || (Mario = {}));
 //# sourceMappingURL=Script.js.map
