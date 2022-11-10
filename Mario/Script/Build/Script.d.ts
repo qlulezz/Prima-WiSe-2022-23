@@ -1,40 +1,39 @@
 declare namespace Mario {
     import ƒ = FudgeCore;
     import ƒAid = FudgeAid;
+    enum ACTION {
+        IDLE = 0,
+        WALK = 1,
+        SPRINT = 2,
+        CROUCH = 3,
+        LOOK = 4
+    }
     class Avatar extends ƒAid.NodeSprite {
-        readonly xSpeedDefault: number;
-        readonly xSpeedSprint: number;
-        readonly jumpForce: number;
-        ySpeed: number;
-        speed: number;
         animationState: string;
-        dead: boolean;
-        animWalk: ƒAid.SpriteSheetAnimation;
-        animSprint: ƒAid.SpriteSheetAnimation;
-        animJump: ƒAid.SpriteSheetAnimation;
-        animLook: ƒAid.SpriteSheetAnimation;
-        animDeath: ƒAid.SpriteSheetAnimation;
+        readonly speedWalk: number;
+        readonly speedSprint: number;
+        readonly jumpForce: number;
+        private ySpeed;
+        private xSpeed;
+        private animWalk;
+        private animSprint;
+        private animJump;
+        private animLook;
+        private animDeath;
         private audioJump;
         private audioDeath;
+        private dead;
+        private animationCurrent;
         constructor();
-        update(_deltaTime: number): void;
-        private reset;
         checkDeath(): boolean;
         jump(): void;
         setJumpAnimation(): void;
-        sprint(sprinting: boolean): void;
         checkCollision(): void;
+        update(_deltaTime: number, dead: boolean): void;
+        act(_action: ACTION): void;
         initializeSounds(): void;
         initializeAnimations(imgSpriteSheet: ƒ.TextureImage): void;
-    }
-}
-declare namespace Mario {
-    import ƒ = FudgeCore;
-    class CustomComponentScript extends ƒ.ComponentScript {
-        static readonly iSubclass: number;
-        message: string;
-        constructor();
-        hndEvent: (_event: Event) => void;
+        private reset;
     }
 }
 declare namespace Mario {
@@ -43,4 +42,14 @@ declare namespace Mario {
     let graph: ƒ.Node;
     let cmpAudio: ƒ.ComponentAudio;
     let gravity: number;
+}
+declare namespace Mario {
+    import ƒ = FudgeCore;
+    class ScriptRotator extends ƒ.ComponentScript {
+        static readonly iSubclass: number;
+        speed: number;
+        constructor();
+        hndEvent: (_event: Event) => void;
+        rotate(node: ƒ.Node): void;
+    }
 }

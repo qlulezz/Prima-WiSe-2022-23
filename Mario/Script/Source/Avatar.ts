@@ -2,53 +2,38 @@ namespace Mario {
   import ƒ = FudgeCore;
   import ƒAid = FudgeAid;
 
+  export enum ACTION {
+    IDLE, WALK, SPRINT, CROUCH, LOOK
+  }
+
   export class Avatar extends ƒAid.NodeSprite {
-
-    public readonly xSpeedDefault: number = .9;
-    readonly xSpeedSprint: number = 2;
-    readonly jumpForce: number = 4.5;
-    public ySpeed: number = 0;
-    public speed: number = this.xSpeedDefault;
-
     public animationState: string = "stand";
-    dead: boolean = false;
 
-    public animWalk: ƒAid.SpriteSheetAnimation;
-    public animSprint: ƒAid.SpriteSheetAnimation;
-    public animJump: ƒAid.SpriteSheetAnimation;
-    public animLook: ƒAid.SpriteSheetAnimation;
-    public animDeath: ƒAid.SpriteSheetAnimation;
+    public readonly speedWalk: number = .9;
+    readonly speedSprint: number = 2;
+    readonly jumpForce: number = 4.5;
+    private ySpeed: number = 0;
+    private xSpeed: number = this.speedWalk;
 
-    // Sounds from https://themushroomkingdom.net/media/smw/wav
-    // Music https://www.youtube.com/watch?v=tAaGKo4XVvM
+    private animWalk: ƒAid.SpriteSheetAnimation;
+    private animSprint: ƒAid.SpriteSheetAnimation;
+    private animJump: ƒAid.SpriteSheetAnimation;
+    private animLook: ƒAid.SpriteSheetAnimation;
+    private animDeath: ƒAid.SpriteSheetAnimation;
+
     private audioJump: ƒ.Audio;
     private audioDeath: ƒ.Audio;
+
+    private dead: boolean = false;
+    private animationCurrent: ƒAid.SpriteSheetAnimation;
 
     public constructor() {
       super("Avatar");
       this.addComponent(new ƒ.ComponentTransform());
     }
 
-    public update(_deltaTime: number): void {
-      this.ySpeed -= gravity * _deltaTime;
-      let yOffset: number = this.ySpeed * _deltaTime;
-      this.mtxLocal.translateY(yOffset);
-    }
-
-    private reset() {
-      cmpAudio.volume = 6;
-      this.mtxLocal.set(new ƒ.Matrix4x4());
-      this.mtxLocal.translateY(0);
-      this.mtxLocal.translateX(-1);
-      this.mtxLocal.translateZ(0.001);
-
-      this.ySpeed = 0;
-      this.dead = false;
-    }
-
     public checkDeath(): boolean {
       // Check for death
-      console.log(this.dead);
       let pos: ƒ.Vector3 = this.mtxLocal.translation;
       if (pos.y < -1 && !this.dead) {
         this.dead = true;
@@ -64,7 +49,9 @@ namespace Mario {
         cmpAudio.volume = 10;
         pos.y = -1;
         ƒ.Time.game.setTimer(3000, 1, () => {
-          this.reset();
+          if (this.dead) {
+            this.reset();
+          }
         });
         viewport.draw();
         return true;
@@ -72,14 +59,17 @@ namespace Mario {
       return false;
     }
 
-    public jump() {
+    public jump(): void {
+      if (this.ySpeed !== 0)
+        return;
+
       this.ySpeed = this.jumpForce;
       cmpAudio.volume = 6;
       cmpAudio.setAudio(this.audioJump);
       cmpAudio.play(true);
     }
 
-    public setJumpAnimation() {
+    public setJumpAnimation(): void {
       if (this.ySpeed > 0) {
         this.animationState = "jump";
         this.setAnimation(this.animJump);
@@ -96,12 +86,6 @@ namespace Mario {
       }
     }
 
-    public sprint(sprinting: boolean) {
-      this.speed = this.xSpeedDefault;
-      if (sprinting)
-        this.speed = this.xSpeedSprint;
-    }
-
     // Check if blocks are below player
     public checkCollision(): void {
       let blocks: ƒ.Node = graph.getChildrenByName("Blocks")[0];
@@ -115,6 +99,46 @@ namespace Mario {
             this.ySpeed = 0;
           }
         }
+      }
+    }
+
+    public update(_deltaTime: number, dead: boolean): void {
+      this.ySpeed -= gravity * _deltaTime;
+      let yOffset: number = this.ySpeed * _deltaTime;
+      this.mtxLocal.translateY(yOffset);
+      if (!dead)
+        this.mtxLocal.translateX(this.xSpeed * _deltaTime, true);
+    }
+
+    public act(_action: ACTION): void {
+      let animation: ƒAid.SpriteSheetAnimation;
+      this.xSpeed = 0;
+      switch (_action) {
+        case ACTION.WALK:
+          this.xSpeed = this.speedWalk;
+          animation = this.animWalk;
+          break;
+        case ACTION.SPRINT:
+          this.xSpeed = this.speedSprint;
+          animation = this.animSprint;
+          break;
+        case ACTION.IDLE:
+          this.showFrame(0);
+          animation = this.animWalk;
+          break;
+        case ACTION.CROUCH:
+          this.showFrame(0);
+          animation = this.animLook;
+          break;
+        case ACTION.LOOK:
+          this.showFrame(1);
+          animation = this.animLook;
+          break;
+      }
+
+      if (animation != this.animationCurrent) {
+        this.setAnimation(animation);
+        this.animationCurrent = animation;
       }
     }
 
@@ -143,6 +167,17 @@ namespace Mario {
 
       this.setAnimation(this.animWalk);
       this.framerate = 20;
+    }
+
+    private reset(): void {
+      this.dead = false;
+      this.ySpeed = 0;
+
+      cmpAudio.volume = 6;
+      this.mtxLocal.set(new ƒ.Matrix4x4());
+      this.mtxLocal.translateY(1);
+      this.mtxLocal.translateX(-1);
+      this.mtxLocal.translateZ(0.001);
     }
   }
 } 

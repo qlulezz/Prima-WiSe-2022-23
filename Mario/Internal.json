@@ -13,6 +13,37 @@
       "type": "Audio"
     }
   },
+  "Material|2022-10-27T19:49:46.028Z|83899": {
+    "ƒ.Material": {
+      "name": "ShaderControls",
+      "idResource": "Material|2022-10-27T19:49:46.028Z|83899",
+      "shader": "ShaderLitTextured",
+      "coat": {
+        "ƒ.CoatTextured": {
+          "color": "[1, 1, 1, 1]",
+          "idTexture": "TextureImage|2022-10-27T19:49:16.875Z|85260"
+        }
+      }
+    }
+  },
+  "TextureImage|2022-10-27T19:49:16.875Z|85260": {
+    "ƒ.TextureImage": {
+      "url": "Images\\Controls.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2022-10-27T19:49:16.875Z|85260",
+        "name": "Images\\Controls.png",
+        "mipmap": "CRISP"
+      }
+    }
+  },
+  "MeshCube|2022-11-10T13:32:29.646Z|96806": {
+    "ƒ.MeshCube": {
+      "idResource": "MeshCube|2022-11-10T13:32:29.646Z|96806",
+      "name": "MeshCube",
+      "type": "MeshCube"
+    }
+  },
   "Graph|2022-10-06T13:16:37.701Z|35847": {
     "ƒ.Graph": {
       "name": "Level",
@@ -26,6 +57,47 @@
               "playing": false,
               "loop": false,
               "volume": 1
+            }
+          }
+        ],
+        "ComponentMesh": [
+          {
+            "ƒ.ComponentMesh": {
+              "idMesh": "MeshCube|2022-11-10T13:32:29.646Z|96806",
+              "pivot": {
+                "translation": "[0.20000000298023224, 0.19999995827674866, 0]",
+                "rotation": "[0, 0, 0]",
+                "scaling": "[0.2999999225139618, 0.30000001192092896, 1]"
+              },
+              "Component": {
+                "active": true
+              }
+            }
+          }
+        ],
+        "ComponentMaterial": [
+          {
+            "ƒ.ComponentMaterial": {
+              "sortForAlpha": false,
+              "clrPrimary": "[1, 1, 1, 1]",
+              "clrSecondary": "[1, 1, 1, 1]",
+              "pivot": {
+                "translation": "[0, 0]",
+                "rotation": 0,
+                "scaling": "[1, 1]"
+              },
+              "Component": {
+                "active": true
+              },
+              "idMaterial": "Material|2022-11-10T13:59:58.209Z|17785"
+            }
+          }
+        ],
+        "ScriptRotator": [
+          {
+            "Mario.ScriptRotator": {
+              "active": true,
+              "speed": 2
             }
           }
         ]
@@ -554,26 +626,14 @@
       "type": "Graph"
     }
   },
-  "TextureImage|2022-10-27T19:49:16.875Z|85260": {
-    "ƒ.TextureImage": {
-      "url": "Images\\Controls.png",
-      "type": "TextureImage",
-      "Texture": {
-        "idResource": "TextureImage|2022-10-27T19:49:16.875Z|85260",
-        "name": "Images\\Controls.png",
-        "mipmap": "CRISP"
-      }
-    }
-  },
-  "Material|2022-10-27T19:49:46.028Z|83899": {
+  "Material|2022-11-10T13:59:58.209Z|17785": {
     "ƒ.Material": {
-      "name": "ShaderControls",
-      "idResource": "Material|2022-10-27T19:49:46.028Z|83899",
+      "name": "ShaderLitTextured",
+      "idResource": "Material|2022-11-10T13:59:58.209Z|17785",
       "shader": "ShaderLitTextured",
       "coat": {
         "ƒ.CoatTextured": {
-          "color": "[1, 1, 1, 1]",
-          "idTexture": "TextureImage|2022-10-27T19:49:16.875Z|85260"
+          "color": "[1, 1, 1, 1]"
         }
       }
     }

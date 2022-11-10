@@ -43,30 +43,24 @@ namespace Mario {
   export let gravity: number = 9.81;
 
   function update(_event: Event): void {
-    let deltaTime: number = ƒ.Loop.timeFrameGame / 1000;
-    avatar.update(deltaTime);
+    const deltaTime: number = ƒ.Loop.timeFrameGame / 1000;
+    const dead: boolean = avatar.checkDeath();
+
+    // Update avatar movement
+    avatar.update(deltaTime, dead);
 
     // Check for death, if dead, stop game and reset
-    const dead = avatar.checkDeath();
     if (dead) return;
 
     // Check if blocks are below player
     avatar.checkCollision();
 
-    avatar.sprint(false);
-    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SHIFT_LEFT, ƒ.KEYBOARD_CODE.SHIFT_RIGHT]))
-      avatar.sprint(true);
-
     // Check for key presses and move player accordingly
-    checkInput(avatar);
-
-    // Rotate based on direction
-    avatar.mtxLocal.rotation = ƒ.Vector3.Y(avatar.animationState.includes("Left") ? 180 : 0);
+    checkInput();
 
     // Jumping
-    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && avatar.ySpeed === 0) {
+    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]))
       avatar.jump();
-    }
     avatar.setJumpAnimation();
 
     // Move clouds
@@ -76,55 +70,23 @@ namespace Mario {
     ƒ.AudioManager.default.update();
   }
 
-  function checkInput(avatar: Avatar): void {
-    // Calculate travel distance
-    const moveDistance = avatar.speed * ƒ.Loop.timeFrameGame / 1000;
-    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT])) {
-      avatar.mtxLocal.translateX(moveDistance);
-      if (avatar.speed > avatar.xSpeedDefault && avatar.animationState !== "sprintRight") {
-        avatar.setAnimation(avatar.animSprint);
-        avatar.animationState = "sprintRight";
-        return;
-      }
-      if (avatar.speed <= avatar.xSpeedDefault && avatar.animationState !== "walkRight") {
-        avatar.setAnimation(avatar.animWalk);
-        avatar.animationState = "walkRight";
-        return;
-      }
-      return;
-    }
-    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT])) {
-      avatar.mtxLocal.translateX(moveDistance);
-      if (avatar.speed > avatar.xSpeedDefault && avatar.animationState !== "sprintLeft") {
-        avatar.setAnimation(avatar.animSprint);
-        avatar.animationState = "sprintLeft";
-        return;
-      }
-      if (avatar.speed <= avatar.xSpeedDefault && avatar.animationState !== "walkLeft") {
-        avatar.setAnimation(avatar.animWalk);
-        avatar.animationState = "walkLeft";
-        return;
-      }
-      return;
-    }
-    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP]) && !avatar.animationState.includes("look")) {
-      avatar.animationState = `look ${avatar.animationState.includes("Left") && "Left"}`;
-      avatar.setAnimation(avatar.animLook);
-      avatar.showFrame(1);
-      return;
-    }
-    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]) && !avatar.animationState.includes("duck")) {
-      avatar.animationState = `duck ${avatar.animationState.includes("Left") && "Left"}`;
-      avatar.setAnimation(avatar.animLook);
-      avatar.showFrame(0);
-      return;
-    }
+  function checkInput(): void {
+    // Check for key presses
+    let run: boolean = ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SHIFT_LEFT, ƒ.KEYBOARD_CODE.SHIFT_RIGHT]);
 
-    if (avatar.animationState.includes("stand")) {
-      avatar.setAnimation(avatar.animWalk);
-      avatar.showFrame(0);
-      return;
+    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT])) {
+      avatar.mtxLocal.rotation = ƒ.Vector3.Y(180);
+      avatar.act(run ? ACTION.SPRINT : ACTION.WALK);
     }
-    avatar.animationState = `stand ${avatar.animationState.includes("Left") && "Left"}`;
+    else if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT])) {
+      avatar.mtxLocal.rotation = ƒ.Vector3.Y(0);
+      avatar.act(run ? ACTION.SPRINT : ACTION.WALK);
+    }
+    else if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP]))
+      avatar.act(ACTION.LOOK);
+    else if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]))
+      avatar.act(ACTION.CROUCH);
+    else
+      avatar.act(ACTION.IDLE);
   }
 }
