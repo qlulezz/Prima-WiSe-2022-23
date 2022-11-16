@@ -1,0 +1,112 @@
+{
+  "MeshObj|2022-11-16T09:16:47.860Z|39697": {
+    "ƒ.MeshObj": {
+      "idResource": "MeshObj|2022-11-16T09:16:47.860Z|39697",
+      "name": "Arwing.obj",
+      "type": "MeshObj",
+      "url": "Arwing.obj"
+    }
+  },
+  "Material|2022-11-16T09:17:09.905Z|21455": {
+    "ƒ.Material": {
+      "name": "ShaderFlat",
+      "idResource": "Material|2022-11-16T09:17:09.905Z|21455",
+      "shader": "ShaderFlat",
+      "coat": {
+        "ƒ.CoatRemissive": {
+          "color": "[1, 1, 1, 1]",
+          "diffuse": 1,
+          "specular": 0
+        }
+      }
+    }
+  },
+  "Graph|2022-11-16T09:16:38.791Z|91285": {
+    "ƒ.Graph": {
+      "name": "Level",
+      "active": true,
+      "components": {
+        "ComponentMesh": [
+          {
+            "ƒ.ComponentMesh": {
+              "idMesh": "MeshObj|2022-11-16T09:16:47.860Z|39697",
+              "pivot": {
+                "translation": "[0, 0, 0]",
+                "rotation": "[0, 0, 0]",
+                "scaling": "[1, 1, 1]"
+              },
+              "Component": {
+                "active": true
+              }
+            }
+          }
+        ],
+        "ComponentMaterial": [
+          {
+            "ƒ.ComponentMaterial": {
+              "sortForAlpha": false,
+              "clrPrimary": "[1, 1, 1, 1]",
+              "clrSecondary": "[1, 1, 1, 1]",
+              "pivot": {
+                "translation": "[0, 0]",
+                "rotation": 0,
+                "scaling": "[1, 1]"
+              },
+              "Component": {
+                "active": true
+              },
+              "idMaterial": "Material|2022-11-16T09:17:09.905Z|21455"
+            }
+          }
+        ],
+        "ComponentLight": [
+          {
+            "ƒ.ComponentLight": {
+              "pivot": {
+                "translation": "[0, 1, 2]",
+                "rotation": "[0, 0, 0]",
+                "scaling": "[10, 10, 10]"
+              },
+              "light": {
+                "ƒ.LightPoint": {
+                  "color": "[1, 1, 1, 1]"
+                }
+              },
+              "Component": {
+                "active": true
+              }
+            }
+          },
+          {
+            "ƒ.ComponentLight": {
+              "pivot": {
+                "translation": "[0, 0, 0]",
+                "rotation": "[-26, 0, 0]",
+                "scaling": "[1, 1, 1]"
+              },
+              "light": {
+                "ƒ.LightDirectional": {
+                  "color": "[1, 1, 1, 1]"
+                }
+              },
+              "Component": {
+                "active": true
+              }
+            }
+          }
+        ],
+        "ScriptRotator": [
+          {
+            "Mario.ScriptRotator": {
+              "active": true,
+              "speed": 1
+            }
+          }
+        ]
+      },
+      "children": [],
+      "idResource": "Graph|2022-11-16T09:16:38.791Z|91285",
+      "type": "Graph"
+    }
+  }
+}
