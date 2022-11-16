@@ -9,6 +9,9 @@ namespace Mario {
 
   function start(_event: CustomEvent): void {
     viewport = _event.detail;
+    viewport.camera.mtxPivot.translateZ(5);
+    viewport.camera.mtxPivot.translateY(.5);
+    viewport.camera.mtxPivot.rotateY(180);
     hndLoad(_event);
   }
 
@@ -45,6 +48,8 @@ namespace Mario {
   function update(_event: Event): void {
     const deltaTime: number = ƒ.Loop.timeFrameGame / 1000;
     const dead: boolean = avatar.checkDeath();
+
+    //viewport.camera.mtxPivot.translation = avatar.mtxLocal.translation;
 
     // Update avatar movement
     avatar.update(deltaTime, dead);

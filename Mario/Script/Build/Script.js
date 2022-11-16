@@ -170,6 +170,9 @@ var Mario;
     document.addEventListener("interactiveViewportStarted", start);
     function start(_event) {
         Mario.viewport = _event.detail;
+        Mario.viewport.camera.mtxPivot.translateZ(5);
+        Mario.viewport.camera.mtxPivot.translateY(.5);
+        Mario.viewport.camera.mtxPivot.rotateY(180);
         hndLoad(_event);
     }
     // Load Mario Sprite and Audio
@@ -197,6 +200,7 @@ var Mario;
     function update(_event) {
         const deltaTime = ƒ.Loop.timeFrameGame / 1000;
         const dead = avatar.checkDeath();
+        //viewport.camera.mtxPivot.translation = avatar.mtxLocal.translation;
         // Update avatar movement
         avatar.update(deltaTime, dead);
         // Check for death, if dead, stop game and reset
