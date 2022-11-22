@@ -44,8 +44,8 @@ var Script;
     document.addEventListener("interactiveViewportStarted", start);
     function start(_event) {
         viewport = _event.detail;
-        viewport.camera.mtxPivot.translateY(2.5);
-        viewport.camera.mtxPivot.rotateX(30);
+        //viewport.camera.mtxPivot.translateY(2.5);
+        //viewport.camera.mtxPivot.rotateX(30);
         ƒ.Loop.addEventListener("loopFrame" /* ƒ.EVENT.LOOP_FRAME */, update);
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }

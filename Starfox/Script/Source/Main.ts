@@ -8,8 +8,8 @@ namespace Script {
   function start(_event: CustomEvent): void {
     viewport = _event.detail;
 
-    viewport.camera.mtxPivot.translateY(2.5);
-    viewport.camera.mtxPivot.rotateX(30);
+    //viewport.camera.mtxPivot.translateY(2.5);
+    //viewport.camera.mtxPivot.rotateX(30);
 
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
