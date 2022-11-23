@@ -177,7 +177,7 @@
                     "idMesh": "MeshObj|2022-11-17T13:55:23.924Z|72175",
                     "pivot": {
                       "translation": "[0, 0, 0]",
-                      "rotation": "[0, 0, 0]",
+                      "rotation": "[0, 180, 0]",
                       "scaling": "[1, 1, 1]"
                     },
                     "Component": {
@@ -204,9 +204,48 @@
                   }
                 }
               ],
-              "ScriptRotator": [
+              "ComponentTransform": [
                 {
-                  "Mario.ScriptRotator": {
+                  "ƒ.ComponentTransform": {
+                    "local": {
+                      "translation": "[0, 0, 0]",
+                      "rotation": "[0, 0, 0]",
+                      "scaling": "[1, 1, 1]"
+                    },
+                    "Component": {
+                      "active": true
+                    }
+                  }
+                }
+              ],
+              "ComponentRigidbody": [
+                {
+                  "ƒ.ComponentRigidbody": {
+                    "initialization": "TO_PIVOT",
+                    "friction": 0.1,
+                    "restitution": 0.2,
+                    "mass": 10,
+                    "dampTranslation": 0.09999999999999987,
+                    "dampRotation": 5,
+                    "effectGravity": 0,
+                    "typeBody": "DYNAMIC",
+                    "typeCollider": "CUBE",
+                    "isTrigger": false,
+                    "id": 1,
+                    "pivot": {
+                      "translation": "[0, -0.20000000298023224, 0]",
+                      "rotation": "[0, 0, 0]",
+                      "scaling": "[4, 0.800000011920929, 3]"
+                    },
+                    "Component": {
+                      "active": true
+                    }
+                  }
+                }
+              ],
+              "ScriptForce": [
+                {
+                  "Starfox.ScriptForce": {
                     "active": true,
                     "speed": 1
                   }
@@ -248,7 +287,7 @@
                       "scaling": "[32, 32]"
                     },
                     "Component": {
-                      "active": false
+                      "active": true
                     },
                     "idMaterial": "Material|2022-11-22T12:09:41.046Z|40013"
                   }

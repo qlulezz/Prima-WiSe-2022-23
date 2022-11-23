@@ -9,13 +9,15 @@ declare namespace Script {
 }
 declare namespace Script {
 }
-declare namespace Mario {
+declare namespace Starfox {
     import ƒ = FudgeCore;
-    class ScriptRotator extends ƒ.ComponentScript {
+    class ScriptForce extends ƒ.ComponentScript {
         static readonly iSubclass: number;
         speed: number;
         constructor();
         hndEvent: (_event: Event) => void;
-        rotate(node: ƒ.Node): void;
+        private readonly forceRot;
+        private readonly forceMove;
+        update(graph: ƒ.Node): void;
     }
 }

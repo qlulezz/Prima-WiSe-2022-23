@@ -50,18 +50,18 @@ var Script;
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
-        // ƒ.Physics.simulate();  // if physics is included and used
+        ƒ.Physics.simulate();
         viewport.draw();
         ƒ.AudioManager.default.update();
     }
 })(Script || (Script = {}));
-var Mario;
-(function (Mario) {
+var Starfox;
+(function (Starfox) {
     var ƒ = FudgeCore;
-    ƒ.Project.registerScriptNamespace(Mario); // Register the namespace to FUDGE for serialization
-    class ScriptRotator extends ƒ.ComponentScript {
+    ƒ.Project.registerScriptNamespace(Starfox); // Register the namespace to FUDGE for serialization
+    class ScriptForce extends ƒ.ComponentScript {
         // Register the script as component for use in the editor via drag&drop
-        static iSubclass = ƒ.Component.registerSubclass(ScriptRotator);
+        static iSubclass = ƒ.Component.registerSubclass(ScriptForce);
         // Properties may be mutated by users in the editor via the automatically created user interface
         speed = 2;
         constructor() {
@@ -79,7 +79,7 @@ var Mario;
             switch (_event.type) {
                 case "componentAdd" /* ƒ.EVENT.COMPONENT_ADD */:
                     //ƒ.Debug.log(this.message, this.node);
-                    this.node.addEventListener("renderPrepare" /* ƒ.EVENT.RENDER_PREPARE */, () => this.rotate(this.node));
+                    this.node.addEventListener("renderPrepare" /* ƒ.EVENT.RENDER_PREPARE */, () => this.update(this.node));
                     break;
                 case "componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */:
                     this.removeEventListener("componentAdd" /* ƒ.EVENT.COMPONENT_ADD */, this.hndEvent);
@@ -90,10 +90,23 @@ var Mario;
                     break;
             }
         };
-        rotate(node) {
-            node.getComponent(ƒ.ComponentMesh).mtxPivot.rotateY(this.speed);
+        forceRot = .2;
+        forceMove = -30;
+        update(graph) {
+            const ship = graph.getComponent(ƒ.ComponentRigidbody);
+            // FIXME: Should rotate based one direction its currently pointing
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W]))
+                ship.applyAngularImpulse(new ƒ.Vector3(-this.forceRot, 0, 0));
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A]))
+                ship.applyAngularImpulse(new ƒ.Vector3(0, 0, this.forceRot));
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S]))
+                ship.applyAngularImpulse(new ƒ.Vector3(this.forceRot, 0, 0));
+            if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D]))
+                ship.applyAngularImpulse(new ƒ.Vector3(0, 0, -this.forceRot));
+            // FIXME: Should move in direction its currently pointing
+            ship.applyForce(new ƒ.Vector3(0, 0, this.forceMove));
         }
     }
-    Mario.ScriptRotator = ScriptRotator;
-})(Mario || (Mario = {}));
+    Starfox.ScriptForce = ScriptForce;
+})(Starfox || (Starfox = {}));
 //# sourceMappingURL=Script.js.map

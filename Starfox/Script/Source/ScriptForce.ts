@@ -1,13 +1,12 @@
-namespace Mario {
+namespace Starfox {
   import ƒ = FudgeCore;
-  ƒ.Project.registerScriptNamespace(Mario);  // Register the namespace to FUDGE for serialization
+  ƒ.Project.registerScriptNamespace(Starfox);  // Register the namespace to FUDGE for serialization
 
-  export class ScriptRotator extends ƒ.ComponentScript {
+  export class ScriptForce extends ƒ.ComponentScript {
     // Register the script as component for use in the editor via drag&drop
-    public static readonly iSubclass: number = ƒ.Component.registerSubclass(ScriptRotator);
+    public static readonly iSubclass: number = ƒ.Component.registerSubclass(ScriptForce);
     // Properties may be mutated by users in the editor via the automatically created user interface
     public speed: number = 2;
-
 
     constructor() {
       super();
@@ -27,7 +26,7 @@ namespace Mario {
       switch (_event.type) {
         case ƒ.EVENT.COMPONENT_ADD:
           //ƒ.Debug.log(this.message, this.node);
-          this.node.addEventListener(ƒ.EVENT.RENDER_PREPARE, () => this.rotate(this.node));
+          this.node.addEventListener(ƒ.EVENT.RENDER_PREPARE, () => this.update(this.node));
           break;
         case ƒ.EVENT.COMPONENT_REMOVE:
           this.removeEventListener(ƒ.EVENT.COMPONENT_ADD, this.hndEvent);
@@ -39,8 +38,27 @@ namespace Mario {
       }
     }
 
-    public rotate(node: ƒ.Node): void {
-      node.getComponent(ƒ.ComponentMesh).mtxPivot.rotateY(this.speed);
+    private readonly forceRot: number = .2;
+    private readonly forceMove: number = -30;
+
+    public update(graph: ƒ.Node): void {
+      const ship = graph.getComponent(ƒ.ComponentRigidbody);
+
+      // FIXME: Should rotate based one direction its currently pointing
+      if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W]))
+        ship.applyAngularImpulse(new ƒ.Vector3(-this.forceRot, 0, 0));
+
+      if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A]))
+        ship.applyAngularImpulse(new ƒ.Vector3(0, 0, this.forceRot));
+
+      if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S]))
+        ship.applyAngularImpulse(new ƒ.Vector3(this.forceRot, 0, 0));
+
+      if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D]))
+        ship.applyAngularImpulse(new ƒ.Vector3(0, 0, -this.forceRot));
+
+      // FIXME: Should move in direction its currently pointing
+      ship.applyForce(new ƒ.Vector3(0, 0, this.forceMove));
     }
 
     // protected reduceMutator(_mutator: ƒ.Mutator): void {
