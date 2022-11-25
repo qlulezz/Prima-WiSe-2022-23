@@ -1,0 +1,87 @@
+* {
+    margin: 0;
+}
+
+body {
+    overflow: hidden;
+}
+
+a {
+    color: white;
+    text-decoration: none;
+}
+
+.background {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.container {
+    display: flex;
+    /* display: grid;
+    grid-template-columns: 1fr 1fr; */
+    gap: 0 1.5rem;
+    white-space: nowrap;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.pixel {
+    padding: 4px;
+    background: black;
+    width: auto;
+    z-index: 2;
+    font-size: 16px;
+    color: white;
+    filter: drop-shadow(3px 3px 0 white) drop-shadow(-1px -1px 0 white);
+    height: auto;
+    margin: 7px;
+    font-family: 'VT323';
+    position: relative;
+    display: block;
+    vertical-align: top;
+    text-transform: uppercase;
+    cursor: pointer;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.pixel::before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: -8px;
+    right: -8px;
+    background: black;
+    z-index: -1;
+}
+
+.pixel::after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: -6px;
+    right: -6px;
+    background: black;
+    z-index: -1;
+}
+
+.pixel:hover {
+    bottom: 5px;
+}
+
+.pixel:active {
+    bottom: 0;
+}
