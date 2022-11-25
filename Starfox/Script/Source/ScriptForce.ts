@@ -27,6 +27,7 @@ namespace Starfox {
         case ƒ.EVENT.COMPONENT_ADD:
           //ƒ.Debug.log(this.message, this.node);
           this.node.addEventListener(ƒ.EVENT.RENDER_PREPARE, () => this.update(this.node));
+          window.addEventListener("mousemove", this.handleMouse);
           break;
         case ƒ.EVENT.COMPONENT_REMOVE:
           this.removeEventListener(ƒ.EVENT.COMPONENT_ADD, this.hndEvent);
@@ -38,27 +39,57 @@ namespace Starfox {
       }
     }
 
-    private readonly forceRot: number = .2;
+    private width: number = 0;
+    private height: number = 0;
+    private xAxis: number = 0;
+    private yAxis: number = 0;
+
+    handleMouse = (e: MouseEvent): void => {
+      this.width = window.innerWidth;
+      this.height = window.innerHeight;
+
+      let mousePositionY: number = e.clientY;
+      let mousePositionX: number = e.clientX;
+
+      this.xAxis = 2 * (mousePositionX / this.width) - 1;
+      this.yAxis = 2 * (mousePositionY / this.height) - 1;
+    }
+
+    private readonly forceRot: number = 0.1;
+    private readonly forceRoll: number = 5;
     private readonly forceMove: number = -30;
 
+    private relativeX: ƒ.Vector3;
+    private relativeY: ƒ.Vector3;
+    private relativeZ: ƒ.Vector3;
+
     public update(graph: ƒ.Node): void {
+      this.calculateRelative(graph);
       const ship = graph.getComponent(ƒ.ComponentRigidbody);
 
-      // FIXME: Should rotate based one direction its currently pointing
       if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W]))
-        ship.applyAngularImpulse(new ƒ.Vector3(-this.forceRot, 0, 0));
+        ship.applyForce(ƒ.Vector3.SCALE(this.relativeZ, this.forceMove));
 
       if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A]))
-        ship.applyAngularImpulse(new ƒ.Vector3(0, 0, this.forceRot));
+        ship.applyTorque(ƒ.Vector3.SCALE(this.relativeZ, this.forceRoll));
 
       if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S]))
-        ship.applyAngularImpulse(new ƒ.Vector3(this.forceRot, 0, 0));
+        ship.applyForce(ƒ.Vector3.SCALE(this.relativeZ, -this.forceMove));
 
       if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D]))
-        ship.applyAngularImpulse(new ƒ.Vector3(0, 0, -this.forceRot));
+        ship.applyTorque(ƒ.Vector3.SCALE(this.relativeZ, -this.forceRoll));
 
-      // FIXME: Should move in direction its currently pointing
-      ship.applyForce(new ƒ.Vector3(0, 0, this.forceMove));
+      ship.applyAngularImpulse(new ƒ.Vector3(0, this.xAxis * -this.forceRot * 1.5, 0));
+      ship.applyAngularImpulse(ƒ.Vector3.SCALE(this.relativeX, this.yAxis * -this.forceRot));
+    }
+
+    private calculateRelative(graph: ƒ.Node): void {
+      this.relativeX = ƒ.Vector3.X(5);
+      this.relativeX.transform(graph.mtxWorld, false);
+      this.relativeY = ƒ.Vector3.Y(5);
+      this.relativeY.transform(graph.mtxWorld, false);
+      this.relativeZ = ƒ.Vector3.Z(5);
+      this.relativeZ.transform(graph.mtxWorld, false);
     }
 
     // protected reduceMutator(_mutator: ƒ.Mutator): void {

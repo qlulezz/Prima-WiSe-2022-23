@@ -16,8 +16,18 @@ declare namespace Starfox {
         speed: number;
         constructor();
         hndEvent: (_event: Event) => void;
+        private width;
+        private height;
+        private xAxis;
+        private yAxis;
+        handleMouse: (e: MouseEvent) => void;
         private readonly forceRot;
+        private readonly forceRoll;
         private readonly forceMove;
+        private relativeX;
+        private relativeY;
+        private relativeZ;
         update(graph: ƒ.Node): void;
+        private calculateRelative;
     }
 }

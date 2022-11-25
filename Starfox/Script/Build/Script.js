@@ -44,8 +44,10 @@ var Script;
     document.addEventListener("interactiveViewportStarted", start);
     function start(_event) {
         viewport = _event.detail;
-        //viewport.camera.mtxPivot.translateY(2.5);
-        //viewport.camera.mtxPivot.rotateX(30);
+        viewport.camera.projectCentral(null, 80);
+        viewport.camera.mtxPivot.translateZ(10);
+        viewport.camera.mtxPivot.translateY(.5);
+        viewport.camera.mtxPivot.rotateY(180);
         ƒ.Loop.addEventListener("loopFrame" /* ƒ.EVENT.LOOP_FRAME */, update);
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
@@ -80,6 +82,7 @@ var Starfox;
                 case "componentAdd" /* ƒ.EVENT.COMPONENT_ADD */:
                     //ƒ.Debug.log(this.message, this.node);
                     this.node.addEventListener("renderPrepare" /* ƒ.EVENT.RENDER_PREPARE */, () => this.update(this.node));
+                    window.addEventListener("mousemove", this.handleMouse);
                     break;
                 case "componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */:
                     this.removeEventListener("componentAdd" /* ƒ.EVENT.COMPONENT_ADD */, this.hndEvent);
@@ -90,21 +93,45 @@ var Starfox;
                     break;
             }
         };
-        forceRot = .2;
+        width = 0;
+        height = 0;
+        xAxis = 0;
+        yAxis = 0;
+        handleMouse = (e) => {
+            this.width = window.innerWidth;
+            this.height = window.innerHeight;
+            let mousePositionY = e.clientY;
+            let mousePositionX = e.clientX;
+            this.xAxis = 2 * (mousePositionX / this.width) - 1;
+            this.yAxis = 2 * (mousePositionY / this.height) - 1;
+        };
+        forceRot = 0.1;
+        forceRoll = 5;
         forceMove = -30;
+        relativeX;
+        relativeY;
+        relativeZ;
         update(graph) {
+            this.calculateRelative(graph);
             const ship = graph.getComponent(ƒ.ComponentRigidbody);
-            // FIXME: Should rotate based one direction its currently pointing
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W]))
-                ship.applyAngularImpulse(new ƒ.Vector3(-this.forceRot, 0, 0));
+                ship.applyForce(ƒ.Vector3.SCALE(this.relativeZ, this.forceMove));
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A]))
-                ship.applyAngularImpulse(new ƒ.Vector3(0, 0, this.forceRot));
+                ship.applyTorque(ƒ.Vector3.SCALE(this.relativeZ, this.forceRoll));
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S]))
-                ship.applyAngularImpulse(new ƒ.Vector3(this.forceRot, 0, 0));
+                ship.applyForce(ƒ.Vector3.SCALE(this.relativeZ, -this.forceMove));
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D]))
-                ship.applyAngularImpulse(new ƒ.Vector3(0, 0, -this.forceRot));
-            // FIXME: Should move in direction its currently pointing
-            ship.applyForce(new ƒ.Vector3(0, 0, this.forceMove));
+                ship.applyTorque(ƒ.Vector3.SCALE(this.relativeZ, -this.forceRoll));
+            ship.applyAngularImpulse(new ƒ.Vector3(0, this.xAxis * -this.forceRot * 1.5, 0));
+            ship.applyAngularImpulse(ƒ.Vector3.SCALE(this.relativeX, this.yAxis * -this.forceRot));
+        }
+        calculateRelative(graph) {
+            this.relativeX = ƒ.Vector3.X(5);
+            this.relativeX.transform(graph.mtxWorld, false);
+            this.relativeY = ƒ.Vector3.Y(5);
+            this.relativeY.transform(graph.mtxWorld, false);
+            this.relativeZ = ƒ.Vector3.Z(5);
+            this.relativeZ.transform(graph.mtxWorld, false);
         }
     }
     Starfox.ScriptForce = ScriptForce;
