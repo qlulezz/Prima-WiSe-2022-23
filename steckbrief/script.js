@@ -1,4 +1,4 @@
-let buttons = document.getElementsByClassName("pixel2");
+let buttons = document.getElementsByClassName("pixel");
 let background = document.getElementsByClassName("background")[0];
 
 let prev = 0;
