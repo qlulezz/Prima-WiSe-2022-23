@@ -36,27 +36,30 @@ var Script;
     }
     Script.CustomComponentScript = CustomComponentScript;
 })(Script || (Script = {}));
-var Script;
-(function (Script) {
+var Starfox;
+(function (Starfox) {
     var ƒ = FudgeCore;
     ƒ.Debug.info("Main Program Template running!");
-    let viewport;
     document.addEventListener("interactiveViewportStarted", start);
     function start(_event) {
-        viewport = _event.detail;
-        viewport.camera.projectCentral(null, 80);
-        viewport.camera.mtxPivot.translateZ(10);
-        viewport.camera.mtxPivot.translateY(.5);
-        viewport.camera.mtxPivot.rotateY(180);
+        Starfox.viewport = _event.detail;
+        Starfox.viewport.camera.projectCentral(null, 80);
+        Starfox.viewport.camera.mtxPivot.translateZ(10);
+        Starfox.viewport.camera.mtxPivot.translateY(.5);
+        Starfox.viewport.camera.mtxPivot.rotateY(180);
+        Starfox.terrain = Starfox.viewport.getBranch().getChildrenByName("City Terrain")[0].getComponent(ƒ.ComponentMesh);
+        let audio = Starfox.viewport.getBranch().getChildrenByName("Audio")[0];
+        Starfox.deathSound = audio.getComponent(ƒ.ComponentAudio);
+        Starfox.deathSound.connect(true);
         ƒ.Loop.addEventListener("loopFrame" /* ƒ.EVENT.LOOP_FRAME */, update);
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
         ƒ.Physics.simulate();
-        viewport.draw();
+        Starfox.viewport.draw();
         ƒ.AudioManager.default.update();
     }
-})(Script || (Script = {}));
+})(Starfox || (Starfox = {}));
 var Starfox;
 (function (Starfox) {
     var ƒ = FudgeCore;
@@ -89,10 +92,12 @@ var Starfox;
                     this.removeEventListener("componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */, this.hndEvent);
                     break;
                 case "nodeDeserialized" /* ƒ.EVENT.NODE_DESERIALIZED */:
+                    this.node.getComponent(ƒ.ComponentRigidbody).addEventListener("ColliderEnteredCollision" /* ƒ.EVENT_PHYSICS.COLLISION_ENTER */, () => this.hndCollision);
                     // if deserialized the node is now fully reconstructed and access to all its components and children is possible
                     break;
             }
         };
+        ship;
         width = 0;
         height = 0;
         xAxis = 0;
@@ -107,23 +112,37 @@ var Starfox;
         };
         forceRot = 0.1;
         forceRoll = 5;
-        forceMove = -30;
+        forceMove = 30;
         relativeX;
         relativeY;
         relativeZ;
+        last = false;
         update(graph) {
             this.calculateRelative(graph);
-            const ship = graph.getComponent(ƒ.ComponentRigidbody);
+            this.ship = graph.getComponent(ƒ.ComponentRigidbody);
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W]))
-                ship.applyForce(ƒ.Vector3.SCALE(this.relativeZ, this.forceMove));
+                this.ship.applyForce(ƒ.Vector3.SCALE(this.relativeZ, this.forceMove));
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A]))
-                ship.applyTorque(ƒ.Vector3.SCALE(this.relativeZ, this.forceRoll));
+                this.ship.applyTorque(ƒ.Vector3.SCALE(this.relativeZ, this.forceRoll));
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S]))
-                ship.applyForce(ƒ.Vector3.SCALE(this.relativeZ, -this.forceMove));
+                this.ship.applyForce(ƒ.Vector3.SCALE(this.relativeZ, -this.forceMove));
             if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D]))
-                ship.applyTorque(ƒ.Vector3.SCALE(this.relativeZ, -this.forceRoll));
-            ship.applyAngularImpulse(new ƒ.Vector3(0, this.xAxis * -this.forceRot * 1.5, 0));
-            ship.applyAngularImpulse(ƒ.Vector3.SCALE(this.relativeX, this.yAxis * -this.forceRot));
+                this.ship.applyTorque(ƒ.Vector3.SCALE(this.relativeZ, -this.forceRoll));
+            this.ship.applyAngularImpulse(new ƒ.Vector3(0, this.xAxis * -this.forceRot * 1.5, 0));
+            this.ship.applyAngularImpulse(ƒ.Vector3.SCALE(this.relativeX, this.yAxis * -this.forceRot));
+            if (!Starfox.terrain)
+                return;
+            let terrainInfo = Starfox.terrain.mesh.getTerrainInfo(this.node.mtxLocal.translation, Starfox.terrain.mtxWorld);
+            let distance = terrainInfo.distance;
+            if (distance <= 0) {
+                if (!this.last) {
+                    console.log("BUMM");
+                    Starfox.deathSound.play(true);
+                }
+                this.last = true;
+                return;
+            }
+            this.last = false;
         }
         calculateRelative(graph) {
             this.relativeX = ƒ.Vector3.X(5);
@@ -132,6 +151,9 @@ var Starfox;
             this.relativeY.transform(graph.mtxWorld, false);
             this.relativeZ = ƒ.Vector3.Z(5);
             this.relativeZ.transform(graph.mtxWorld, false);
+        }
+        hndCollision() {
+            console.log("Collision!");
         }
     }
     Starfox.ScriptForce = ScriptForce;

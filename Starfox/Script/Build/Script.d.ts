@@ -7,7 +7,11 @@ declare namespace Script {
         hndEvent: (_event: Event) => void;
     }
 }
-declare namespace Script {
+declare namespace Starfox {
+    import ƒ = FudgeCore;
+    let viewport: ƒ.Viewport;
+    let terrain: ƒ.ComponentMesh;
+    let deathSound: ƒ.ComponentAudio;
 }
 declare namespace Starfox {
     import ƒ = FudgeCore;
@@ -16,6 +20,7 @@ declare namespace Starfox {
         speed: number;
         constructor();
         hndEvent: (_event: Event) => void;
+        ship: ƒ.ComponentRigidbody;
         private width;
         private height;
         private xAxis;
@@ -27,7 +32,9 @@ declare namespace Starfox {
         private relativeX;
         private relativeY;
         private relativeZ;
+        private last;
         update(graph: ƒ.Node): void;
         private calculateRelative;
+        private hndCollision;
     }
 }

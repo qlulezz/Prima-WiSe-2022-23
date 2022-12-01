@@ -27,6 +27,7 @@ namespace Starfox {
         case ƒ.EVENT.COMPONENT_ADD:
           //ƒ.Debug.log(this.message, this.node);
           this.node.addEventListener(ƒ.EVENT.RENDER_PREPARE, () => this.update(this.node));
+
           window.addEventListener("mousemove", this.handleMouse);
           break;
         case ƒ.EVENT.COMPONENT_REMOVE:
@@ -34,10 +35,13 @@ namespace Starfox {
           this.removeEventListener(ƒ.EVENT.COMPONENT_REMOVE, this.hndEvent);
           break;
         case ƒ.EVENT.NODE_DESERIALIZED:
+          this.node.getComponent(ƒ.ComponentRigidbody).addEventListener(ƒ.EVENT_PHYSICS.COLLISION_ENTER, () => this.hndCollision);
           // if deserialized the node is now fully reconstructed and access to all its components and children is possible
           break;
       }
     }
+
+    public ship: ƒ.ComponentRigidbody;
 
     private width: number = 0;
     private height: number = 0;
@@ -57,30 +61,47 @@ namespace Starfox {
 
     private readonly forceRot: number = 0.1;
     private readonly forceRoll: number = 5;
-    private readonly forceMove: number = -30;
+    private readonly forceMove: number = 30;
 
     private relativeX: ƒ.Vector3;
     private relativeY: ƒ.Vector3;
     private relativeZ: ƒ.Vector3;
 
+    private last: boolean = false;
+
     public update(graph: ƒ.Node): void {
       this.calculateRelative(graph);
-      const ship = graph.getComponent(ƒ.ComponentRigidbody);
+      this.ship = graph.getComponent(ƒ.ComponentRigidbody);
 
       if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W]))
-        ship.applyForce(ƒ.Vector3.SCALE(this.relativeZ, this.forceMove));
+        this.ship.applyForce(ƒ.Vector3.SCALE(this.relativeZ, this.forceMove));
 
       if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A]))
-        ship.applyTorque(ƒ.Vector3.SCALE(this.relativeZ, this.forceRoll));
+        this.ship.applyTorque(ƒ.Vector3.SCALE(this.relativeZ, this.forceRoll));
 
       if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S]))
-        ship.applyForce(ƒ.Vector3.SCALE(this.relativeZ, -this.forceMove));
+        this.ship.applyForce(ƒ.Vector3.SCALE(this.relativeZ, -this.forceMove));
 
       if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D]))
-        ship.applyTorque(ƒ.Vector3.SCALE(this.relativeZ, -this.forceRoll));
+        this.ship.applyTorque(ƒ.Vector3.SCALE(this.relativeZ, -this.forceRoll));
 
-      ship.applyAngularImpulse(new ƒ.Vector3(0, this.xAxis * -this.forceRot * 1.5, 0));
-      ship.applyAngularImpulse(ƒ.Vector3.SCALE(this.relativeX, this.yAxis * -this.forceRot));
+      this.ship.applyAngularImpulse(new ƒ.Vector3(0, this.xAxis * -this.forceRot * 1.5, 0));
+      this.ship.applyAngularImpulse(ƒ.Vector3.SCALE(this.relativeX, this.yAxis * -this.forceRot));
+
+      if (!terrain) return;
+
+      let terrainInfo: ƒ.TerrainInfo = (<ƒ.MeshTerrain>terrain.mesh).getTerrainInfo(this.node.mtxLocal.translation, terrain.mtxWorld);
+      let distance: number = terrainInfo.distance;
+
+      if (distance <= 0) {
+        if (!this.last) {         
+          console.log("BUMM");
+          deathSound.play(true);
+        }
+        this.last = true;
+        return;
+      }
+      this.last = false;
     }
 
     private calculateRelative(graph: ƒ.Node): void {
@@ -90,6 +111,10 @@ namespace Starfox {
       this.relativeY.transform(graph.mtxWorld, false);
       this.relativeZ = ƒ.Vector3.Z(5);
       this.relativeZ.transform(graph.mtxWorld, false);
+    }
+
+    private hndCollision(): void {
+      console.log("Collision!");
     }
 
     // protected reduceMutator(_mutator: ƒ.Mutator): void {
