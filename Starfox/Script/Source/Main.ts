@@ -7,9 +7,12 @@ namespace Starfox {
 
   export let terrain: ƒ.ComponentMesh;
   export let deathSound: ƒ.ComponentAudio;
+  export let gameState: GameState;
 
   function start(_event: CustomEvent): void {
     viewport = _event.detail;
+
+    gameState = new GameState();
 
     viewport.camera.projectCentral(null, 80);
     viewport.camera.mtxPivot.translateZ(10);

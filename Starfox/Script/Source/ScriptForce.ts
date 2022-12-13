@@ -93,6 +93,9 @@ namespace Starfox {
       let terrainInfo: ƒ.TerrainInfo = (<ƒ.MeshTerrain>terrain.mesh).getTerrainInfo(this.node.mtxLocal.translation, terrain.mtxWorld);
       let distance: number = terrainInfo.distance;
 
+      gameState.height = `Height: ${distance.toFixed(3)} m`;
+      gameState.velocity = `Speed: ${this.ship.getVelocity().magnitude.toFixed(2)} m/s`;
+
       if (distance <= 0) {
         if (!this.last) {         
           console.log("BUMM");

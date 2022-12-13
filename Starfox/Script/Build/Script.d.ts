@@ -9,9 +9,20 @@ declare namespace Script {
 }
 declare namespace Starfox {
     import ƒ = FudgeCore;
+    class GameState extends ƒ.Mutable {
+        protected reduceMutator(_mutator: ƒ.Mutator): void;
+        height: string;
+        velocity: string;
+        private controller;
+        constructor();
+    }
+}
+declare namespace Starfox {
+    import ƒ = FudgeCore;
     let viewport: ƒ.Viewport;
     let terrain: ƒ.ComponentMesh;
     let deathSound: ƒ.ComponentAudio;
+    let gameState: GameState;
 }
 declare namespace Starfox {
     import ƒ = FudgeCore;

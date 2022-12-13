@@ -39,10 +39,28 @@ var Script;
 var Starfox;
 (function (Starfox) {
     var ƒ = FudgeCore;
+    var ƒui = FudgeUserInterface;
+    class GameState extends ƒ.Mutable {
+        reduceMutator(_mutator) { }
+        height = "1";
+        velocity = "2";
+        controller;
+        constructor() {
+            super();
+            this.controller = new ƒui.Controller(this, document.querySelector("#vui"));
+            console.log(this.controller);
+        }
+    }
+    Starfox.GameState = GameState;
+})(Starfox || (Starfox = {}));
+var Starfox;
+(function (Starfox) {
+    var ƒ = FudgeCore;
     ƒ.Debug.info("Main Program Template running!");
     document.addEventListener("interactiveViewportStarted", start);
     function start(_event) {
         Starfox.viewport = _event.detail;
+        Starfox.gameState = new Starfox.GameState();
         Starfox.viewport.camera.projectCentral(null, 80);
         Starfox.viewport.camera.mtxPivot.translateZ(10);
         Starfox.viewport.camera.mtxPivot.translateY(.5);
@@ -134,6 +152,8 @@ var Starfox;
                 return;
             let terrainInfo = Starfox.terrain.mesh.getTerrainInfo(this.node.mtxLocal.translation, Starfox.terrain.mtxWorld);
             let distance = terrainInfo.distance;
+            Starfox.gameState.height = `Height: ${distance.toFixed(3)} m`;
+            Starfox.gameState.velocity = `Speed: ${this.ship.getVelocity().magnitude.toFixed(2)} m/s`;
             if (distance <= 0) {
                 if (!this.last) {
                     console.log("BUMM");
