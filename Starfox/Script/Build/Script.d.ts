@@ -26,6 +26,16 @@ declare namespace Starfox {
 }
 declare namespace Starfox {
     import ƒ = FudgeCore;
+    class ScriptAnimation extends ƒ.ComponentScript {
+        static readonly iSubclass: number;
+        message: string;
+        constructor();
+        hndEvent: (_event: Event) => void;
+        update(graph: ƒ.Node): void;
+    }
+}
+declare namespace Starfox {
+    import ƒ = FudgeCore;
     class ScriptForce extends ƒ.ComponentScript {
         static readonly iSubclass: number;
         speed: number;

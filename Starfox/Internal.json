@@ -89,6 +89,33 @@
       }
     }
   },
+  "Audio|2022-11-29T16:21:55.312Z|87037": {
+    "ƒ.Audio": {
+      "url": "Assets\\Sounds\\Explosion.mp3",
+      "idResource": "Audio|2022-11-29T16:21:55.312Z|87037",
+      "name": "Assets\\Sounds\\Explosion.mp3",
+      "type": "Audio"
+    }
+  },
+  "MeshCube|2022-11-22T12:28:06.010Z|22918": {
+    "ƒ.MeshCube": {
+      "idResource": "MeshCube|2022-11-22T12:28:06.010Z|22918",
+      "name": "MeshCube",
+      "type": "MeshCube"
+    }
+  },
+  "Material|2022-12-13T15:09:21.405Z|53945": {
+    "ƒ.Material": {
+      "name": "ShaderLitTextured",
+      "idResource": "Material|2022-12-13T15:09:21.405Z|53945",
+      "shader": "ShaderLitTextured",
+      "coat": {
+        "ƒ.CoatTextured": {
+          "color": "[1, 1, 1, 1]"
+        }
+      }
+    }
+  },
   "Graph|2022-11-16T09:16:38.791Z|91285": {
     "ƒ.Graph": {
       "name": "Level",
@@ -254,7 +281,8 @@
                     "yAxis": 0,
                     "forceRot": 0.1,
                     "forceRoll": 5,
-                    "forceMove": -30
+                    "forceMove": -30,
+                    "last": false
                   }
                 }
               ]
@@ -467,6 +495,70 @@
             },
             "children": []
           }
+        },
+        {
+          "ƒ.Node": {
+            "name": "Items",
+            "active": true,
+            "components": {
+              "ComponentMesh": [
+                {
+                  "ƒ.ComponentMesh": {
+                    "idMesh": "MeshCube|2022-11-22T12:28:06.010Z|22918",
+                    "pivot": {
+                      "translation": "[0, 0, 0]",
+                      "rotation": "[0, 0, 0]",
+                      "scaling": "[1, 1, 1]"
+                    },
+                    "Component": {
+                      "active": true
+                    }
+                  }
+                }
+              ],
+              "ComponentMaterial": [
+                {
+                  "ƒ.ComponentMaterial": {
+                    "sortForAlpha": false,
+                    "clrPrimary": "[1, 1, 1, 1]",
+                    "clrSecondary": "[1, 1, 1, 1]",
+                    "pivot": {
+                      "translation": "[0, 0]",
+                      "rotation": 0,
+                      "scaling": "[1, 1]"
+                    },
+                    "Component": {
+                      "active": true
+                    },
+                    "idMaterial": "Material|2022-12-13T15:09:21.405Z|53945"
+                  }
+                }
+              ],
+              "ComponentTransform": [
+                {
+                  "ƒ.ComponentTransform": {
+                    "local": {
+                      "translation": "[0, 0, -5]",
+                      "rotation": "[0, 0, 0]",
+                      "scaling": "[1, 1, 1]"
+                    },
+                    "Component": {
+                      "active": true
+                    }
+                  }
+                }
+              ],
+              "ScriptAnimation": [
+                {
+                  "Starfox.ScriptAnimation": {
+                    "active": true,
+                    "message": "CustomComponentScript added to "
+                  }
+                }
+              ]
+            },
+            "children": []
+          }
         }
       ],
       "idResource": "Graph|2022-11-16T09:16:38.791Z|91285",
@@ -482,13 +574,6 @@
         "name": "Assets\\Images\\skyscraper.png",
         "mipmap": "CRISP"
       }
-    }
-  },
-  "MeshCube|2022-11-22T12:28:06.010Z|22918": {
-    "ƒ.MeshCube": {
-      "idResource": "MeshCube|2022-11-22T12:28:06.010Z|22918",
-      "name": "MeshCube",
-      "type": "MeshCube"
     }
   },
   "Material|2022-11-22T12:28:21.113Z|94190": {
@@ -546,14 +631,6 @@
       "children": [],
       "idResource": "Graph|2022-11-22T12:27:51.803Z|90270",
       "type": "Graph"
-    }
-  },
-  "Audio|2022-11-29T16:21:55.312Z|87037": {
-    "ƒ.Audio": {
-      "url": "Assets\\Sounds\\Explosion.mp3",
-      "idResource": "Audio|2022-11-29T16:21:55.312Z|87037",
-      "name": "Assets\\Sounds\\Explosion.mp3",
-      "type": "Audio"
     }
   }
 }
