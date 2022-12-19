@@ -302,8 +302,8 @@ var xsoldier;
         xsoldier.itemSprite = await createSprite("Item", 32, 32, 32, 4);
         xsoldier.starTypes[0] = await createSprite("Star1", 4, 4, 4, 4);
         xsoldier.starTypes[1] = await createSprite("Star2", 4, 12, 12, 4);
-        xsoldier.expLarge = await createSprite("expLarge", 66, 66, 66, 4);
-        xsoldier.expSmall = await createSprite("expSmall", 32, 32, 32, 5);
+        xsoldier.expLarge = await createSprite("ExpLarge", 66, 66, 66, 4);
+        xsoldier.expSmall = await createSprite("ExpSmall", 32, 32, 32, 5);
     }
     async function createSprite(name, _w, _h, _offset, _frames) {
         let spriteSheet = new ƒ.TextureImage();

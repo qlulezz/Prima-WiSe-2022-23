@@ -70,8 +70,8 @@ namespace xsoldier {
     starTypes[0] = await createSprite("Star1", 4, 4, 4, 4);
     starTypes[1] = await createSprite("Star2", 4, 12, 12, 4);
 
-    expLarge = await createSprite("expLarge", 66, 66, 66, 4);
-    expSmall = await createSprite("expSmall", 32, 32, 32, 5);
+    expLarge = await createSprite("ExpLarge", 66, 66, 66, 4);
+    expSmall = await createSprite("ExpSmall", 32, 32, 32, 5);
   }
 
   // Creates a new Sprite based on file, width, height, offset and number of frames
