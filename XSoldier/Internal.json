@@ -1,0 +1,196 @@
+{
+  "MeshQuad|2022-10-18T16:01:38.431Z|44304": {
+    "ƒ.MeshQuad": {
+      "idResource": "MeshQuad|2022-10-18T16:01:38.431Z|44304",
+      "name": "Background"
+    }
+  },
+  "Material|2022-10-18T16:01:50.259Z|85002": {
+    "ƒ.Material": {
+      "name": "BackgroundShader",
+      "idResource": "Material|2022-10-18T16:01:50.259Z|85002",
+      "shader": "ShaderLit",
+      "coat": {
+        "ƒ.CoatColored": {
+          "color": "[1, 1, 1, 0]"
+        }
+      }
+    }
+  },
+  "Audio|2022-11-17T18:20:05.443Z|92154": {
+    "ƒ.Audio": {
+      "url": "Assets\\Music\\0-Menu.mp3",
+      "idResource": "Audio|2022-11-17T18:20:05.443Z|92154",
+      "name": "Assets\\Music\\0-Menu.mp3",
+      "type": "Audio"
+    }
+  },
+  "Audio|2022-11-17T20:40:09.489Z|47568": {
+    "ƒ.Audio": {
+      "url": "Assets\\Sounds\\Laser Shot.mp3",
+      "idResource": "Audio|2022-11-17T20:40:09.489Z|47568",
+      "name": "Assets\\Sounds\\Laser Shot.mp3",
+      "type": "Audio"
+    }
+  },
+  "Audio|2022-11-17T20:46:50.892Z|80442": {
+    "ƒ.Audio": {
+      "url": "Assets\\Sounds\\Player Explosion.mp3",
+      "idResource": "Audio|2022-11-17T20:46:50.892Z|80442",
+      "name": "Assets\\Sounds\\Player Explosion.mp3",
+      "type": "Audio"
+    }
+  },
+  "Graph|2022-10-18T16:00:26.250Z|59990": {
+    "ƒ.Graph": {
+      "name": "Level",
+      "active": true,
+      "components": {
+        "ComponentMesh": [
+          {
+            "ƒ.ComponentMesh": {
+              "idMesh": "MeshQuad|2022-10-18T16:01:38.431Z|44304",
+              "pivot": {
+                "translation": "[0, 0, -2]",
+                "rotation": "[0, 0, 0]",
+                "scaling": "[10, 10, 1]"
+              },
+              "Component": {
+                "active": true
+              }
+            }
+          }
+        ],
+        "ComponentMaterial": [
+          {
+            "ƒ.ComponentMaterial": {
+              "sortForAlpha": false,
+              "clrPrimary": "[1, 1, 1, 1]",
+              "clrSecondary": "[1, 1, 1, 1]",
+              "pivot": {
+                "translation": "[0, 0]",
+                "rotation": 0,
+                "scaling": "[1, 1]"
+              },
+              "Component": {
+                "active": true
+              },
+              "idMaterial": "Material|2022-10-18T16:01:50.259Z|85002"
+            }
+          }
+        ]
+      },
+      "children": [
+        {
+          "ƒ.Node": {
+            "name": "Audio",
+            "active": true,
+            "components": {},
+            "children": [
+              {
+                "ƒ.Node": {
+                  "name": "StageMusic",
+                  "active": true,
+                  "components": {
+                    "ComponentAudio": [
+                      {
+                        "ƒ.ComponentAudio": {
+                          "active": true,
+                          "idResource": "Audio|2022-11-17T18:20:05.443Z|92154",
+                          "playing": false,
+                          "loop": true,
+                          "volume": 0.4000000059604645
+                        }
+                      }
+                    ]
+                  },
+                  "children": []
+                }
+              },
+              {
+                "ƒ.Node": {
+                  "name": "Weapon",
+                  "active": true,
+                  "components": {
+                    "ComponentAudio": [
+                      {
+                        "ƒ.ComponentAudio": {
+                          "active": true,
+                          "idResource": "Audio|2022-11-17T20:40:09.489Z|47568",
+                          "playing": false,
+                          "loop": false,
+                          "volume": 1
+                        }
+                      }
+                    ]
+                  },
+                  "children": []
+                }
+              },
+              {
+                "ƒ.Node": {
+                  "name": "PlayerExplosion",
+                  "active": true,
+                  "components": {
+                    "ComponentAudio": [
+                      {
+                        "ƒ.ComponentAudio": {
+                          "active": true,
+                          "idResource": "Audio|2022-11-17T20:46:50.892Z|80442",
+                          "playing": false,
+                          "loop": false,
+                          "volume": 1
+                        }
+                      }
+                    ]
+                  },
+                  "children": []
+                }
+              },
+              {
+                "ƒ.Node": {
+                  "name": "EnemyExplosion",
+                  "active": true,
+                  "components": {
+                    "ComponentAudio": [
+                      {
+                        "ƒ.ComponentAudio": {
+                          "active": true,
+                          "idResource": "Audio|2022-12-07T16:53:45.287Z|49554",
+                          "playing": false,
+                          "loop": false,
+                          "volume": 1.4
+                        }
+                      }
+                    ]
+                  },
+                  "children": []
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "idResource": "Graph|2022-10-18T16:00:26.250Z|59990",
+      "type": "Graph"
+    }
+  },
+  "Graph|2022-10-18T16:00:39.629Z|52212": {
+    "ƒ.Graph": {
+      "name": "Player",
+      "active": true,
+      "components": {},
+      "children": [],
+      "idResource": "Graph|2022-10-18T16:00:39.629Z|52212",
+      "type": "Graph"
+    }
+  },
+  "Audio|2022-12-07T16:53:45.287Z|49554": {
+    "ƒ.Audio": {
+      "url": "Assets\\Sounds\\Bomb Hit.mp3",
+      "idResource": "Audio|2022-12-07T16:53:45.287Z|49554",
+      "name": "Assets\\Sounds\\Bomb Hit.mp3",
+      "type": "Audio"
+    }
+  }
+}

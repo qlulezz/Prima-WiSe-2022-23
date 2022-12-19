@@ -1,0 +1,209 @@
+@import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
+
+:root {
+  --clr-bg: #000;
+  --clr-fg: #fff;
+  --clr-primary: #26ED90;
+  --clr-primary-dark: #219E64;
+  --clr-complementary: #ed2683;
+  --clr-analogous-1: #26ed2d;
+  --clr-analogous-2: #26e6ed;
+  --clr-triadic-1: #2683ed;
+  --clr-triadic-2: #9026ed;
+  --clr-00dp: hsl(0, 0%, 7%);
+  --clr-01dp: hsl(0, 0%, 11%);
+  --clr-02dp: hsl(0, 0%, 13%);
+  --clr-03dp: hsl(0, 0%, 14%);
+  --clr-04dp: hsl(0, 0%, 15%);
+  --clr-06dp: hsl(0, 0%, 17%);
+  --clr-08dp: hsl(0, 0%, 18%);
+  --clr-12dp: hsl(0, 0%, 20%);
+  --clr-16dp: hsl(0, 0%, 21%);
+  --clr-24dp: hsl(0, 0%, 22%);
+  --clr-bg-transparent: rgba(0, 0, 0, 0.2);
+  --clr-bg-transparent2: hsla(0, 0%, 7%, 60%);
+}
+
+/* CSS Boilerplate https://www.joshwcomeau.com/css/custom-css-reset/ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+#root,
+#__next {
+  isolation: isolate;
+}
+
+/* CSS */
+
+*::selection {
+  background: var(--clr-fg);
+  color: var(--clr-bg);
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover,
+a:active,
+a:focus {
+  text-decoration: underline;
+}
+
+html,
+body {
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  color: var(--clr-fg);
+  background-color: var(--clr-bg);
+  font-family: 'Silkscreen', cursive, sans-serif;
+  text-align: center;
+}
+
+dialog {
+  margin: auto;
+  text-align: center;
+  font-size: 1.5rem;
+  color: var(--clr-fg);
+  background: none;
+  border: none;
+}
+
+.canvas-container {
+  display: grid;
+  place-items: center;
+  position: relative;
+  width: 768px;
+  height: 1024px;
+  border: 2px solid white;
+  transform: scale(.8);
+  transform-origin: top;
+  margin: auto;
+}
+
+canvas.fullscreen {
+  width: 100%;
+  height: 100%;
+}
+
+.bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  inset: 0;
+  filter: brightness(2) contrast(2) grayscale();
+}
+
+.blink {
+  font-size: 1.2em;
+  animation: blink-animation 1s steps(2, start) infinite;
+  -webkit-animation: blink-animation 1s steps(2, start) infinite;
+}
+
+@keyframes blink-animation {
+  to {
+    visibility: hidden;
+  }
+}
+
+@-webkit-keyframes blink-animation {
+  to {
+    visibility: hidden;
+  }
+}
+
+#vui {
+  display: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  top: 0;
+  font-size: 1.75em;
+}
+
+.vui-container {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+  align-content: space-between;
+  padding: 10px;
+  height: 100%;
+}
+
+#vui input {
+  background: none;
+  border: none;
+  color: var(--clr-fg);
+  max-width: 300px;
+  pointer-events: none;
+}
+
+#vui .vui-container div:nth-child(1) *,
+#vui .vui-container div:nth-child(3) * {
+  text-align: left;
+}
+
+#vui .vui-container div:nth-child(2) *,
+#vui .vui-container div:nth-child(4) * {
+  text-align: right;
+}
+
+#vui .info {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#vui .info input {
+  text-align: center;
+}

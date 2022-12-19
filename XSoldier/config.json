@@ -1,0 +1,59 @@
+{
+  "space": {
+    "limitTop": 2.1,
+    "limitBottom": -2.35,
+    "limitLeft": -1.65,
+    "limitRight": 1.65
+  },
+  "player": {
+    "flySpeed": 2,
+    "boostSpeed": 4,
+    "accuracy": 0.15,
+    "size": 0.2
+  },
+  "item": {
+    "dropRate": 0.125
+  },
+  "projectile": [
+    {
+      "speed": 8,
+      "fireRate": 125,
+      "baseDamage": 10
+    },
+    {
+      "speed": 10,
+      "fireRate": 100,
+      "baseDamage": 5
+    },
+    {
+      "speed": 6,
+      "fireRate": 350,
+      "baseDamage": 15
+    }
+  ],
+  "enemy": [
+    {
+      "speed": 1,
+      "speedTolerance": 0.5,
+      "birthRate": 600
+    },
+    {
+      "speed": 5,
+      "speedTolerance": 0.5,
+      "birthRate": 1000
+    },
+    {
+      "speed": 2,
+      "speedTolerance": 0.5,
+      "birthRate": 200
+    }
+  ],
+  "stage": [
+    {
+      "enemyCount": [
+        100,
+        100
+      ]
+    }
+  ]
+}
