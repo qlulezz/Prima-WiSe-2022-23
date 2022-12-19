@@ -77,7 +77,7 @@ namespace xsoldier {
   // Creates a new Sprite based on file, width, height, offset and number of frames
   async function createSprite(name: string, _w: number, _h: number, _offset: number, _frames: number): Promise<ƒAid.SpriteSheetAnimation> {
     let spriteSheet: ƒ.TextureImage = new ƒ.TextureImage();
-    await spriteSheet.load(`./Assets/Sprites/PNG/${name}.png`);
+    await spriteSheet.load(`./Assets/Sprites/${name}.png`);
     let coat: ƒ.CoatTextured = new ƒ.CoatTextured(undefined, spriteSheet);
     let animation: ƒAid.SpriteSheetAnimation = new ƒAid.SpriteSheetAnimation(name, coat);
     animation.generateByGrid(ƒ.Rectangle.GET(0, 0, _w, _h), _frames, 128, ƒ.ORIGIN2D.CENTER, ƒ.Vector2.Y(_offset));
@@ -86,14 +86,14 @@ namespace xsoldier {
 
   async function hndLoad(_event: Event): Promise<void> {
     // Load config
-    config = await (await fetch("../../config.json")).json();
+    config = await (await fetch("./config.json")).json();
 
     vui = new VUI();
 
     // Load spritesheets
     await initializeSpriteSheets();
     const imgSpriteSheet: ƒ.TextureImage = new ƒ.TextureImage();
-    await imgSpriteSheet.load("./Assets/Sprites/PNG/Player.png");
+    await imgSpriteSheet.load("./Assets/Sprites/Player.png");
 
     // Create avatar
     avatar = new Avatar();

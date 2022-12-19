@@ -307,18 +307,18 @@ var xsoldier;
     }
     async function createSprite(name, _w, _h, _offset, _frames) {
         let spriteSheet = new ƒ.TextureImage();
-        await spriteSheet.load(`./Assets/Sprites/PNG/${name}.png`);
+        await spriteSheet.load(`./Assets/Sprites/${name}.png`);
         let coat = new ƒ.CoatTextured(undefined, spriteSheet);
         let animation = new ƒAid.SpriteSheetAnimation(name, coat);
         animation.generateByGrid(ƒ.Rectangle.GET(0, 0, _w, _h), _frames, 128, ƒ.ORIGIN2D.CENTER, ƒ.Vector2.Y(_offset));
         return animation;
     }
     async function hndLoad(_event) {
-        xsoldier.config = await (await fetch("../../config.json")).json();
+        xsoldier.config = await (await fetch("./config.json")).json();
         xsoldier.vui = new xsoldier.VUI();
         await initializeSpriteSheets();
         const imgSpriteSheet = new ƒ.TextureImage();
-        await imgSpriteSheet.load("./Assets/Sprites/PNG/Player.png");
+        await imgSpriteSheet.load("./Assets/Sprites/Player.png");
         avatar = new xsoldier.Avatar();
         avatar.initializeAnimations(imgSpriteSheet);
         let graph = viewport.getBranch();
