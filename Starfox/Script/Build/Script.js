@@ -64,6 +64,7 @@ var Starfox;
     function start(_event) {
         Starfox.viewport = _event.detail;
         Starfox.gameState = new Starfox.GameState();
+        //startGuard();
         Starfox.viewport.camera.projectCentral(null, 80);
         Starfox.viewport.camera.mtxPivot.translateZ(10);
         Starfox.viewport.camera.mtxPivot.translateY(.5);
@@ -255,5 +256,91 @@ var Starfox;
         }
     }
     Starfox.ScriptForce = ScriptForce;
+})(Starfox || (Starfox = {}));
+var Starfox;
+(function (Starfox) {
+    var ƒ = FudgeCore;
+    var ƒAid = FudgeAid;
+    ƒ.Project.registerScriptNamespace(Starfox); // Register the namespace to FUDGE for serialization
+    let JOB;
+    (function (JOB) {
+        JOB[JOB["IDLE"] = 0] = "IDLE";
+        JOB[JOB["ATTACK"] = 1] = "ATTACK";
+    })(JOB || (JOB = {}));
+    class ScriptStateMachine extends ƒAid.ComponentStateMachine {
+        static iSubclass = ƒ.Component.registerSubclass(ScriptStateMachine);
+        static instructions = ScriptStateMachine.get();
+        constructor() {
+            super();
+            this.instructions = ScriptStateMachine.instructions; // setup instructions with the static set
+            // Don't start when running in editor
+            if (ƒ.Project.mode == ƒ.MODE.EDITOR)
+                return;
+            // Listen to this component being added to or removed from a node
+            this.addEventListener("componentAdd" /* ƒ.EVENT.COMPONENT_ADD */, this.hndEvent);
+            this.addEventListener("componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */, this.hndEvent);
+            this.addEventListener("nodeDeserialized" /* ƒ.EVENT.NODE_DESERIALIZED */, this.hndEvent);
+        }
+        static get() {
+            let setup = new ƒAid.StateMachineInstructions();
+            setup.transitDefault = ScriptStateMachine.transitDefault;
+            setup.actDefault = ScriptStateMachine.actDefault;
+            setup.setAction(JOB.IDLE, this.actIdle);
+            setup.setAction(JOB.ATTACK, this.actAttack);
+            setup.setTransition(JOB.IDLE, JOB.ATTACK, this.transitAttack);
+            return setup;
+        }
+        static transitDefault(_machine) {
+            console.log("Transit to", _machine.stateNext);
+        }
+        static async actDefault(_machine) {
+            console.log(JOB[_machine.stateCurrent]);
+        }
+        static async actIdle(_machine) {
+            //console.log("actIDLE");
+            _machine.node.getComponent(ƒ.ComponentTransform).mtxLocal.rotateY(1);
+            ScriptStateMachine.actDefault(_machine);
+        }
+        static async actAttack(_machine) {
+            //console.log("actATTACK";)
+            _machine.node.getComponent(ƒ.ComponentTransform).mtxLocal.rotateY(3);
+            ScriptStateMachine.actDefault(_machine);
+        }
+        static transitAttack(_machine) {
+        }
+        // Activate the functions of this component as response to events
+        hndEvent = (_event) => {
+            switch (_event.type) {
+                case "componentAdd" /* ƒ.EVENT.COMPONENT_ADD */:
+                    //ƒ.Debug.log(this.message, this.node);
+                    ƒ.Loop.addEventListener("loopFrame" /* ƒ.EVENT.LOOP_FRAME */, this.update);
+                    this.transit(JOB.IDLE);
+                    break;
+                case "componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */:
+                    this.removeEventListener("componentAdd" /* ƒ.EVENT.COMPONENT_ADD */, this.hndEvent);
+                    this.removeEventListener("componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */, this.hndEvent);
+                    break;
+                case "nodeDeserialized" /* ƒ.EVENT.NODE_DESERIALIZED */:
+                    this.transit(JOB.IDLE);
+                    // if deserialized the node is now fully reconstructed and access to all its components and children is possible
+                    /* let transform: ƒ.ComponentTransform = this.node.getComponent(ƒ.ComponentTransform);
+                    let ship: ƒ.ComponentTransform = viewport.getBranch().getChildrenByName("Avatar")[0].getComponent(ƒ.ComponentTransform);
+                    let distance: ƒ.Vector3 = ƒ.Vector3.DIFFERENCE(ship.mtxWorld.translation, _machine.node.mtxWorld.translation);
+                    console.log(distance);
+          
+                    if (distance.magnitude > 10) {
+                      _machine.transit(JOB.ATTACK);
+                    } */
+                    break;
+            }
+        };
+        update = (_event) => {
+            this.act();
+        };
+        getDistance(a, b) {
+            return Math.hypot(a.mtxLocal.translation.x - b.mtxLocal.translation.x, a.mtxLocal.translation.y - b.mtxLocal.translation.y);
+        }
+    }
+    Starfox.ScriptStateMachine = ScriptStateMachine;
 })(Starfox || (Starfox = {}));
 //# sourceMappingURL=Script.js.map

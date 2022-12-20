@@ -59,3 +59,25 @@ declare namespace Starfox {
         private hndCollision;
     }
 }
+declare namespace Starfox {
+    import ƒAid = FudgeAid;
+    enum JOB {
+        IDLE = 0,
+        ATTACK = 1
+    }
+    export class ScriptStateMachine extends ƒAid.ComponentStateMachine<JOB> {
+        static readonly iSubclass: number;
+        private static instructions;
+        constructor();
+        static get(): ƒAid.StateMachineInstructions<JOB>;
+        private static transitDefault;
+        private static actDefault;
+        private static actIdle;
+        private static actAttack;
+        private static transitAttack;
+        hndEvent: (_event: Event) => void;
+        private update;
+        private getDistance;
+    }
+    export {};
+}

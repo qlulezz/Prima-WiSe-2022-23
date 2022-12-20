@@ -13,6 +13,8 @@ namespace Starfox {
     viewport = _event.detail;
 
     gameState = new GameState();
+    
+    //startGuard();
 
     viewport.camera.projectCentral(null, 80);
     viewport.camera.mtxPivot.translateZ(10);
