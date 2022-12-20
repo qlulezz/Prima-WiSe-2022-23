@@ -9,7 +9,7 @@ for (let i = 0; i < buttons.length; i++) {
     if (prev !== i) {
 
       if (i === 0)
-        background.setAttribute("src", "./steckbrief/starfox-preview.webm");
+        background.setAttribute("src", "./steckbrief/xsoldier-preview.webm");
       else
         background.setAttribute("src", `./steckbrief/${name}-preview.webm`);
 
