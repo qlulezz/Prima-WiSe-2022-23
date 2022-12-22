@@ -22,6 +22,8 @@
   --clr-24dp: hsl(0, 0%, 22%);
   --clr-bg-transparent: rgba(0, 0, 0, 0.2);
   --clr-bg-transparent2: hsla(0, 0%, 7%, 60%);
+
+  --vui-visible: none;
 }
 
 /* CSS Boilerplate https://www.joshwcomeau.com/css/custom-css-reset/ */
@@ -187,6 +189,10 @@ canvas.fullscreen {
   pointer-events: none;
 }
 
+#vui .vui-container div {
+  display: var(--vui-visible);
+}
+
 #vui .vui-container div:nth-child(1) *,
 #vui .vui-container div:nth-child(3) * {
   text-align: left;
@@ -206,4 +212,17 @@ canvas.fullscreen {
 
 #vui .info input {
   text-align: center;
+}
+
+#vui .start {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+}
+
+#vui .controls {
+  margin-top: 5rem;
+  font-size: .8em;
 }

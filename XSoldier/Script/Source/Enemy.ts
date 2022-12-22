@@ -17,33 +17,7 @@ namespace xsoldier {
     }
 
     public move(): void {
-      switch (this.enemyType) {
-        case 0: {
-          this.mtxLocal.translateY(this.flySpeed * ƒ.Loop.timeFrameReal / 1000);
-          break;
-        }
-        case 1: {
-
-          break;
-        }
-        case 2: {
-
-          break;
-        }
-        case 3: {
-
-          break;
-        }
-        case 4: {
-
-          break;
-        }
-        case 5: {
-
-          break;
-        }
-      }
-
+      this.mtxLocal.translateY(this.flySpeed * ƒ.Loop.timeFrameReal / 1000);
     }
 
     public initializeAnimations(): void {
@@ -52,6 +26,48 @@ namespace xsoldier {
       const tolerance: number = config.enemy[this.enemyType].speedTolerance;
       this.flySpeed += random(-tolerance, tolerance);
       this.setFrameDirection(0);
+
+      switch (this.enemyType) {
+        case 2: {
+          let startPos: number = random(config.space.limitLeft, config.space.limitRight);
+          let animseq: ƒ.AnimationSequence = new ƒ.AnimationSequence();
+          animseq.addKey(new ƒ.AnimationKey(0, startPos + 0));
+          animseq.addKey(new ƒ.AnimationKey(1000, startPos + 1));
+          animseq.addKey(new ƒ.AnimationKey(2000, startPos + 0));
+
+          let animStructure: ƒ.AnimationStructure = {
+            components: {
+              ComponentTransform: [
+                {
+                  "ƒ.ComponentTransform": {
+                    mtxLocal: {
+                      translation: {
+                        x: animseq
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          };
+
+          let animation: ƒ.Animation = new ƒ.Animation("emeny2Animation", animStructure, 60);
+          let cmpAnimator: ƒ.ComponentAnimator = new ƒ.ComponentAnimator(
+            animation,
+            ƒ.ANIMATION_PLAYMODE.LOOP,
+            ƒ.ANIMATION_PLAYBACK.TIMEBASED_CONTINOUS
+          );
+
+          /* animation.setEvent("animationEvent", 0);
+          cmpAnimator.addEventListener("animationEvent", (_event: Event) => {
+            let time: number = (<ƒ.ComponentAnimator>_event.target).time;
+            console.log(`Event fired with delay of ${Math.round(time)}ms`, _event);
+          }); */
+
+          this.addComponent(cmpAnimator);
+          cmpAnimator.activate(true);
+        }
+      }
     }
   }
 }

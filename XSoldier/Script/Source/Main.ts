@@ -129,10 +129,11 @@ namespace xsoldier {
 
     switch (currentStage) {
       case 0: {
-        vui.info = "Click To Start";
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE])) {
           avatar.resetPosition(true);
           currentStage++;
+          document.querySelector(".start").setAttribute("style", "display: none");
+          document.documentElement.style.setProperty("--vui-visible", "block");
         }
         return;
       }
@@ -375,7 +376,12 @@ namespace xsoldier {
         return;
       } */
 
-      vui.info = "STAGE " + currentStage;
+      console.log(currentStage, lastStage, currentBoss, lastBoss);
+
+      if (!currentBoss) {
+        vui.info = "STAGE " + currentStage;
+      }
+
       setStageMusic(currentStage, currentBoss);
       ƒ.Time.game.setTimer(2500, 1, () => {
         vui.info = "";

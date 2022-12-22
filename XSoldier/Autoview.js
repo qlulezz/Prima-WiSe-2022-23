@@ -21,14 +21,8 @@
  
  // show dialog for startup, user interaction required e.g. for starting audio
  function init(_event)/* : void */ {
-   let dialog/* : HTMLDialogElement */ = document.querySelector("dialog");
-   dialog.querySelector("h1").textContent = document.title;
-   dialog.addEventListener("click", function (_event) {
-     dialog.close();
-     let graphId/* : string */ = document.head.querySelector("meta[autoView]").getAttribute("autoView")
-     startInteractiveViewport(graphId);
-   });
-   dialog.showModal();
+   let graphId/* : string */ = document.head.querySelector("meta[autoView]").getAttribute("autoView")
+   startInteractiveViewport(graphId);
  }
  
  // setup and start interactive viewport

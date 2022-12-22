@@ -205,27 +205,7 @@ var xsoldier;
             this.mtxLocal.translateX(xsoldier.random(xsoldier.config.space.limitLeft, xsoldier.config.space.limitRight));
         }
         move() {
-            switch (this.enemyType) {
-                case 0: {
-                    this.mtxLocal.translateY(this.flySpeed * ƒ.Loop.timeFrameReal / 1000);
-                    break;
-                }
-                case 1: {
-                    break;
-                }
-                case 2: {
-                    break;
-                }
-                case 3: {
-                    break;
-                }
-                case 4: {
-                    break;
-                }
-                case 5: {
-                    break;
-                }
-            }
+            this.mtxLocal.translateY(this.flySpeed * ƒ.Loop.timeFrameReal / 1000);
         }
         initializeAnimations() {
             this.setAnimation(xsoldier.enemyTypes[this.enemyType]);
@@ -233,6 +213,34 @@ var xsoldier;
             const tolerance = xsoldier.config.enemy[this.enemyType].speedTolerance;
             this.flySpeed += xsoldier.random(-tolerance, tolerance);
             this.setFrameDirection(0);
+            switch (this.enemyType) {
+                case 2: {
+                    let startPos = xsoldier.random(xsoldier.config.space.limitLeft, xsoldier.config.space.limitRight);
+                    let animseq = new ƒ.AnimationSequence();
+                    animseq.addKey(new ƒ.AnimationKey(0, startPos + 0));
+                    animseq.addKey(new ƒ.AnimationKey(1000, startPos + 1));
+                    animseq.addKey(new ƒ.AnimationKey(2000, startPos + 0));
+                    let animStructure = {
+                        components: {
+                            ComponentTransform: [
+                                {
+                                    "ƒ.ComponentTransform": {
+                                        mtxLocal: {
+                                            translation: {
+                                                x: animseq
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    };
+                    let animation = new ƒ.Animation("emeny2Animation", animStructure, 60);
+                    let cmpAnimator = new ƒ.ComponentAnimator(animation, ƒ.ANIMATION_PLAYMODE.LOOP, ƒ.ANIMATION_PLAYBACK.TIMEBASED_CONTINOUS);
+                    this.addComponent(cmpAnimator);
+                    cmpAnimator.activate(true);
+                }
+            }
         }
     }
     xsoldier.Enemy = Enemy;
@@ -342,10 +350,11 @@ var xsoldier;
         }
         switch (currentStage) {
             case 0: {
-                xsoldier.vui.info = "Click To Start";
                 if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE])) {
                     avatar.resetPosition(true);
                     currentStage++;
+                    document.querySelector(".start").setAttribute("style", "display: none");
+                    document.documentElement.style.setProperty("--vui-visible", "block");
                 }
                 return;
             }
@@ -517,7 +526,10 @@ var xsoldier;
     }
     function updateStage() {
         if (currentStage != lastStage || currentBoss != lastBoss) {
-            xsoldier.vui.info = "STAGE " + currentStage;
+            console.log(currentStage, lastStage, currentBoss, lastBoss);
+            if (!currentBoss) {
+                xsoldier.vui.info = "STAGE " + currentStage;
+            }
             xsoldier.setStageMusic(currentStage, currentBoss);
             ƒ.Time.game.setTimer(2500, 1, () => {
                 xsoldier.vui.info = "";
@@ -719,6 +731,10 @@ var xsoldier;
                     }
                     default: {
                         createProjectile(avatar, projectiles, new ƒ.Vector2(posX, posY), 0);
+                        createProjectile(avatar, projectiles, new ƒ.Vector2(posX, posY), 7);
+                        createProjectile(avatar, projectiles, new ƒ.Vector2(posX, posY), -7);
+                        createProjectile(avatar, projectiles, new ƒ.Vector2(posX, posY), 15);
+                        createProjectile(avatar, projectiles, new ƒ.Vector2(posX, posY), -15);
                     }
                 }
                 break;

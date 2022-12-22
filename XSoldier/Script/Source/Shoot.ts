@@ -90,6 +90,10 @@ namespace xsoldier {
           }
           default: {
             createProjectile(avatar, projectiles, new ƒ.Vector2(posX, posY), 0);
+            createProjectile(avatar, projectiles, new ƒ.Vector2(posX, posY), 7);
+            createProjectile(avatar, projectiles, new ƒ.Vector2(posX, posY), -7);
+            createProjectile(avatar, projectiles, new ƒ.Vector2(posX, posY), 15);
+            createProjectile(avatar, projectiles, new ƒ.Vector2(posX, posY), -15);
           }
         }
         break;
